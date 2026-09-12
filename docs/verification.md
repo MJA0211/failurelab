@@ -1,5 +1,13 @@
 # Implementation verification
 
+## Unfamiliar CI validation: September 12, 2026
+
+The [single-incident record](unfamiliar-ci-validation.md) documents actual GitHub
+ingestion, live agent calls, and repository execution in a disposable hosted Linux VM.
+The final suite passed 130 tests with 77% coverage. The incident reached a supported
+result after tool-contract correction; earlier inconclusive attempts remain recorded.
+The updated four-fixture live check is incomplete.
+
 ## Live provider update: September 12, 2026
 
 Both agent stages completed real provider calls on four owned fixtures, with three
@@ -98,7 +106,7 @@ Reproduce with `uv run python scripts/load_smoke.py` while the local server is r
 | Chat/vision inference | Text diagnosis and planning exercised with real provider calls; see [live verification](live-agent-verification.md) | Vision inference, other models/providers, and held-out model quality |
 | Neural retrieval | Actual sentence-transformer and cross-encoder adapter | Optional model installation/download and quality benchmark |
 | GitHub ingestion | Live public metadata; logs, artifacts, redirects, version pinning, and failures tested through controlled HTTP responses | Private repository credentials and retained production artifacts |
-| Linux repository runner | Implemented checkout, manifest validation, test identity checks, and bounded subprocess execution; parser/manifest/client contracts tested | Disposable Linux VM and a reviewed target repository |
+| Linux repository runner | Actual reviewed repository checkout, unchanged browser assertions, HTTP authentication/replay, and artifact return in a disposable GitHub-hosted Linux VM; see [validation](unfamiliar-ci-validation.md) | Permanent private endpoint, strict public egress isolation, and arbitrary untrusted-repository deployment |
 | PostgreSQL | Store/checkpointer adapter and configuration | Running PostgreSQL service |
 | Docker | Dockerfile/Compose definition | Docker engine unavailable in this implementation environment |
 

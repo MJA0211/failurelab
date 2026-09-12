@@ -38,9 +38,15 @@ prompt, not an independent test of generalization.
 
 A subsequent run of the published acceptance script and the 16-case live evaluation
 were interrupted by HTTP 402 Payment Required. No baseline substitution occurred.
-There is no completed live evaluation score from that attempt. The published script
-includes additional reporting and a missing-evidence assertion; a complete successful
-run of that final script still requires provider credit.
+There is no completed live evaluation score from that attempt. After access was
+restored, the published script passed all four cases with prompt v2, recording eight
+calls, 10,892 input tokens, and 858 output tokens under ignored
+`var/live-acceptance/1cbf6db942804a0f9454b651090f7d7c/`.
+
+The later [unfamiliar incident](unfamiliar-ci-validation.md) exercised real GitHub
+ingestion and the Linux runner, and led to prompt v3. Its final four-fixture regression
+rerun passed overlay and selector but stopped on a provider error before completing
+the API-contract case. That updated check remains incomplete.
 
 The application test suite passed **122 tests** in 74.15 seconds. The frontend
 production build passed, and npm audit reported zero vulnerabilities.
@@ -80,5 +86,6 @@ Model availability and account credit affect whether these commands can run. See
 
 These results establish live integration on owned synthetic fixtures. They do not
 establish held-out diagnostic accuracy, visual inference quality, production capacity,
-or developer time savings. PostgreSQL, Docker, and remote repository runner acceptance
-remain separate unverified deployment paths.
+or developer time savings. PostgreSQL and Docker remain unverified deployment paths.
+Linux runner verification is limited to the reviewed owned repository and hosted VM
+environment described in the unfamiliar-incident record.

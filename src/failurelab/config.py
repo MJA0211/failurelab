@@ -20,7 +20,7 @@ class Settings(BaseSettings):
     database_url: str = ""
     model_mode: Literal["baseline", "chat"] = "baseline"
     model_base_url: str = "https://router.huggingface.co/v1"
-    model_name: str = "Qwen/Qwen3-VL-4B-Instruct"
+    model_name: str = "Qwen/Qwen3-235B-A22B-Instruct-2507:novita"
     model_api_key: SecretStr = SecretStr("")
     model_vision: bool = False
     retrieval_mode: Literal["lexical", "hybrid"] = "lexical"

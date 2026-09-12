@@ -1,6 +1,6 @@
 [project]
 name = "failurelab"
-version = "0.1.1"
+version = "0.1.2"
 description = "Evidence-first CI investigations with reproducible browser experiments"
 requires-python = ">=3.11"
 dependencies = [

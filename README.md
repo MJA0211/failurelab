@@ -70,6 +70,10 @@ Both LLM stages have been exercised with a real provider on owned fixtures. See 
 failure found and corrected during testing, and the provider-credit limit encountered
 in the follow-up evaluation.
 
+The [unfamiliar CI validation](docs/unfamiliar-ci-validation.md) follows a separate
+authored GitHub incident through live diagnosis, planning, and a real Linux browser
+experiment. It records unsuccessful attempts as well as the supported result.
+
 Copy `.env.example` to `.env` to configure integrations. Empty optional values use
 their documented defaults. Secrets remain server-side and `.env` is Git-ignored.
 

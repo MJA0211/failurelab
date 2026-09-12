@@ -1845,7 +1845,7 @@ export default function App() {
             <ExternalLink size={13} />
           </a>
           <div className="sidebar-footnote">
-            FAILURELAB <span>v{config?.version || "0.1.1"}</span>
+            FAILURELAB <span>v{config?.version || "0.1.2"}</span>
           </div>
         </div>
       </aside>

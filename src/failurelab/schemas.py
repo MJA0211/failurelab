@@ -37,7 +37,15 @@ class Diagnosis(StrictModel):
 
 class ExperimentPlan(StrictModel):
     hypothesis_id: str = Field(pattern=r"^h[1-3]$")
-    intervention: Intervention
+    intervention: Intervention = Field(
+        description=(
+            "Choose an operator-reviewed application intervention: remove_overlay removes an "
+            "obstructing UI layer; restore_selector restores the locator/DOM contract; "
+            "restore_response restores the API response contract. repeat_baseline changes "
+            "nothing and measures repeatability only; it cannot discriminate a proposed "
+            "mechanism or support a causal finding. Availability is checked by the runner."
+        )
+    )
     rationale: str = Field(min_length=1, max_length=1000)
     repetitions: int = Field(default=3, ge=2, le=5)
 

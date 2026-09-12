@@ -23,6 +23,10 @@ Chromium startup, and the full test suite in your container host before release.
 The application container is for orchestration and owned fixtures. It is not a sandbox
 for arbitrary repositories. The repository runner needs a separate disposable Linux VM.
 
+The [single-incident validation](unfamiliar-ci-validation.md) exercised the runner on
+a disposable GitHub-hosted Linux VM with an owned repository. That acceptance does
+not validate the container deployment or a permanent private runner endpoint.
+
 ## Separate workers and PostgreSQL
 
 Install `uv sync --extra dev --extra postgres`. Configure:
