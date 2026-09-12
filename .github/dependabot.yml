@@ -20,7 +20,10 @@ updates:
       timezone: America/New_York
     open-pull-requests-limit: 5
     groups:
+      vite-toolchain:
+        patterns: [vite, "@vitejs/plugin-react"]
       frontend-minor-patch:
+        exclude-patterns: [vite, "@vitejs/plugin-react"]
         update-types: [minor, patch]
   - package-ecosystem: github-actions
     directory: /
