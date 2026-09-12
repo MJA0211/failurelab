@@ -226,7 +226,7 @@ def create_runner_app():
         authorization: str = Header(default=""),
         idempotency_key: str = Header(default=""),
     ):
-        if not secrets.compare_digest(authorization, "Bearer " + token):
+        if not secrets.compare_digest(authorization.encode(), ("Bearer " + token).encode()):
             raise HTTPException(401, "Invalid runner credentials")
         digest = allowlist.get(request.repository.lower())
         if not digest:

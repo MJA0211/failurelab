@@ -72,3 +72,49 @@ def test_remote_runner_requires_full_commit_sha():
             test_name="checkout",
             plan={"hypothesis_id": "h1", "intervention": "remove_overlay", "rationale": "test"},
         )
+
+
+def test_runner_rejects_malformed_credentials_before_execution(tmp_path, monkeypatch):
+    from types import SimpleNamespace
+
+    from fastapi.testclient import TestClient
+
+    from failurelab import runner_service
+
+    token = "runner-test-token-with-24-characters"
+    # Exercise only the HTTP contract on Windows; no repository code is executed.
+    monkeypatch.setattr(
+        runner_service,
+        "os",
+        SimpleNamespace(
+            name="posix",
+            environ={
+                "FAILURELAB_RUNNER_TOKEN": token,
+                "FAILURELAB_RUNNER_CACHE": str(tmp_path / "runner-cache"),
+            },
+        ),
+    )
+
+    def forbidden(*args):
+        pytest.fail("Unauthenticated or unreviewed requests must not execute code")
+
+    monkeypatch.setattr(runner_service, "execute", forbidden)
+    payload = {
+        "repository": "owner/repo",
+        "commit_sha": "a" * 40,
+        "test_name": "checkout",
+        "plan": {"hypothesis_id": "h1", "intervention": "remove_overlay", "rationale": "test"},
+    }
+    with TestClient(runner_service.create_runner_app()) as client:
+        assert (
+            client.post(
+                "/experiments", json=payload, headers=[(b"authorization", b"Bearer \xff")]
+            ).status_code
+            == 401
+        )
+        assert (
+            client.post(
+                "/experiments", json=payload, headers={"Authorization": "Bearer " + token}
+            ).status_code
+            == 403
+        )

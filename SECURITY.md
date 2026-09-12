@@ -5,12 +5,24 @@ workspace API access, including downloads. It is not per-user authentication or
 multi-tenancy. Binding outside loopback requires a token. A same-origin deployment
 is expected; foreign browser origins are rejected. Configure TLS at the reverse proxy.
 
+Origin checks compare the scheme, hostname, and effective port. Malformed or duplicate
+Origin headers are rejected, and localhost ports have no cross-origin exemption.
+The Vite development server uses its same-origin proxy. Loopback deployments accept
+only localhost and the IPv4/IPv6 loopback literals as Host values. A reverse proxy
+must preserve the public Host and forward the correct scheme through a trusted proxy
+configuration; do not trust forwarded headers from arbitrary clients.
+
 Webhook signatures are validated against the raw request body before parsing.
 Repository imports require an explicit allowlist. HTTP redirects for GitHub storage
 are allowlisted and fetched without GitHub Authorization headers. Request, archive,
 expansion, model output, and experiment bounds prevent common accidental overloads.
 Use ingress rate limits for an internet-facing deployment; app authentication alone
 is not a distributed abuse-prevention service.
+
+GitHub metadata and artifact responses are read incrementally and stopped when the
+decoded response exceeds the configured ingestion limit. The response stream is
+closed on rejection. Bearer tokens and webhook signatures use constant-time byte
+comparisons so malformed non-ASCII headers are rejected without a comparison error.
 
 Retrieved content is untrusted evidence. It cannot add tools or executable commands.
 Structured outputs and citation references are validated. These controls reduce the
@@ -32,3 +44,13 @@ the VM boundary and credential/network restrictions remain mandatory.
 
 Do not report credentials or private logs in public issues. Security fixes should
 include regression tests demonstrating the actual boundary that failed.
+
+Report vulnerabilities through [GitHub's private reporting form](https://github.com/MJA0211/failurelab/security/advisories/new).
+Include the affected version, reproduction steps using synthetic data, and the
+expected and observed behavior. Remove credentials and private repository evidence
+from the report.
+
+CI audits installed Python dependencies and the npm lockfile for known vulnerabilities.
+Third-party CI actions are pinned to commit hashes, and checkout does not persist
+its credentials. These checks supplement the isolation and access controls above;
+they do not establish that the application is free of vulnerabilities.

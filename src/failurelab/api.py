@@ -19,6 +19,28 @@ from failurelab.store import Store
 from failurelab.workflow import Worker
 
 
+def origin_identity(value: str) -> tuple[str, str, int]:
+    """Parse a serialized HTTP origin without silently accepting URL credentials or paths."""
+    if any(ord(char) <= 32 or ord(char) >= 127 for char in value):
+        raise ValueError("Invalid origin characters")
+    parsed = urlparse(value)
+    if (
+        parsed.scheme not in {"http", "https"}
+        or not parsed.hostname
+        or parsed.username is not None
+        or parsed.password is not None
+        or parsed.path
+        or parsed.params
+        or parsed.query
+        or parsed.fragment
+        or parsed.netloc.endswith(":")
+        or "\\" in parsed.netloc
+    ):
+        raise ValueError("Invalid HTTP origin")
+    port = parsed.port if parsed.port is not None else (443 if parsed.scheme == "https" else 80)
+    return parsed.scheme, parsed.hostname, port
+
+
 def create_app(settings: Settings | None = None):
     settings = settings or Settings()
     store = Store(settings)
@@ -44,25 +66,26 @@ def create_app(settings: Settings | None = None):
 
     @app.middleware("http")
     async def boundary(request, call_next):
-        if settings.host in {"localhost", "127.0.0.1", "::1"} and request.url.hostname not in {
+        try:
+            if (
+                len(request.headers.getlist("host")) != 1
+                or len(request.headers.getlist("origin")) > 1
+            ):
+                raise ValueError("Ambiguous origin")
+            target = origin_identity(f"{request.scope['scheme']}://{request.headers['host']}")
+            origin = request.headers.get("origin")
+            if origin is not None and origin_identity(origin) != target:
+                raise ValueError("Cross-origin request")
+        except ValueError:
+            return JSONResponse({"detail": "Origin or Host is not allowed"}, status_code=403)
+        if settings.host in {"localhost", "127.0.0.1", "::1"} and target[1] not in {
             "localhost",
             "127.0.0.1",
             "::1",
-            "testserver",
         }:
             return JSONResponse(
                 {"detail": "Host is not allowed for a loopback workspace"}, status_code=403
             )
-        origin = request.headers.get("origin")
-        if origin:
-            parsed = urlparse(origin)
-            same = parsed.netloc == request.headers.get("host")
-            local = parsed.hostname in {"localhost", "127.0.0.1", "::1"} and parsed.port in {
-                5173,
-                8787,
-            }
-            if not same and not local:
-                return JSONResponse({"detail": "Origin is not allowed"}, status_code=403)
         if request.method in {"POST", "PUT", "PATCH"}:
             size, chunks = 0, []
             async for chunk in request.stream():
@@ -71,22 +94,25 @@ def create_app(settings: Settings | None = None):
                     return JSONResponse({"detail": "Request body exceeds 2 MB"}, status_code=413)
                 chunks.append(chunk)
             request._body = b"".join(chunks)
+        return await call_next(request)
+
+    @app.middleware("http")
+    async def response_headers(request, call_next):
+        # Registered outside the boundary so rejected requests receive these headers too.
         response = await call_next(request)
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["Referrer-Policy"] = "no-referrer"
         response.headers["X-Frame-Options"] = "DENY"
         response.headers["Cache-Control"] = (
-            "no-store" if request.url.path.startswith("/api") else "no-cache"
+            "no-store" if request.scope["path"].startswith("/api") else "no-cache"
         )
-        if origin and request.method == "OPTIONS":
-            response.headers["Access-Control-Allow-Origin"] = origin
-            response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
-            response.headers["Access-Control-Allow-Headers"] = "Authorization, Content-Type"
         return response
 
     def authorize(authorization: str | None = Header(default=None)):
         token = settings.api_token.get_secret_value()
-        if token and not secrets.compare_digest(authorization or "", "Bearer " + token):
+        if token and not secrets.compare_digest(
+            (authorization or "").encode(), ("Bearer " + token).encode()
+        ):
             raise HTTPException(401, "An API token is required")
 
     auth = [Depends(authorize)]
@@ -270,7 +296,9 @@ def create_app(settings: Settings | None = None):
             raise HTTPException(503, "GitHub webhook is not configured")
         raw = await request.body()
         expected = "sha256=" + hmac.new(secret.encode(), raw, hashlib.sha256).hexdigest()
-        if not hmac.compare_digest(expected, request.headers.get("x-hub-signature-256", "")):
+        if not hmac.compare_digest(
+            expected.encode(), request.headers.get("x-hub-signature-256", "").encode()
+        ):
             raise HTTPException(401, "Invalid webhook signature")
         if request.headers.get("x-github-event") == "ping":
             return {"received": True}

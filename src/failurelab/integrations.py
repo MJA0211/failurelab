@@ -49,28 +49,32 @@ class GitHub:
 
     def get(self, path):
         for attempt in range(3):
-            response = self.client.get(path)
-            if response.status_code not in {429, 502, 503, 504}:
-                break
+            with self.client.stream("GET", path) as response:
+                if response.status_code == 200:
+                    return json.loads(self.read_bounded(response))
+                if response.status_code not in {429, 502, 503, 504} or attempt == 2:
+                    raise IntegrationError(
+                        f"GitHub returned HTTP {response.status_code}. Check repository access, artifact retention, and API limits."
+                    )
             if attempt < 2:
                 time.sleep(0.25 * 2**attempt)
-        if response.status_code != 200:
-            raise IntegrationError(
-                f"GitHub returned HTTP {response.status_code}. Check repository access, artifact retention, and API limits."
-            )
-        if len(response.content) > self.settings.max_artifact_bytes:
-            raise IntegrationError("GitHub response exceeded the ingestion limit")
-        return response.json()
+
+    def read_bounded(self, response):
+        chunks, size = [], 0
+        for chunk in response.iter_bytes():
+            size += len(chunk)
+            if size > self.settings.max_artifact_bytes:
+                raise IntegrationError("GitHub response exceeded the ingestion limit")
+            chunks.append(chunk)
+        return b"".join(chunks)
 
     def download(self, path):
-        response = self.client.get(path)
-        if response.status_code == 200:
-            if len(response.content) > self.settings.max_artifact_bytes:
-                raise IntegrationError("Download exceeded the ingestion limit")
-            return response.content
-        if response.status_code not in {301, 302, 303, 307, 308}:
-            raise IntegrationError(f"Artifact unavailable (HTTP {response.status_code})")
-        location = response.headers.get("location", "")
+        with self.client.stream("GET", path) as response:
+            if response.status_code == 200:
+                return self.read_bounded(response)
+            if response.status_code not in {301, 302, 303, 307, 308}:
+                raise IntegrationError(f"Artifact unavailable (HTTP {response.status_code})")
+            location = response.headers.get("location", "")
         parsed = urlparse(location)
         host = parsed.hostname or ""
         if (
@@ -92,13 +96,7 @@ class GitHub:
             with client.stream("GET", location) as stream:
                 if stream.status_code != 200:
                     raise IntegrationError("GitHub storage download failed")
-                chunks, size = [], 0
-                for chunk in stream.iter_bytes():
-                    size += len(chunk)
-                    if size > self.settings.max_artifact_bytes:
-                        raise IntegrationError("Artifact exceeded the ingestion limit")
-                    chunks.append(chunk)
-        return b"".join(chunks)
+                return self.read_bounded(stream)
 
     def describe_run(self, repository, run_id):
         self.allowed(repository)

@@ -20,5 +20,5 @@ def store(settings):
 
 @pytest.fixture
 def client(settings):
-    with TestClient(create_app(settings)) as instance:
+    with TestClient(create_app(settings), base_url="http://127.0.0.1") as instance:
         yield instance

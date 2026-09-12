@@ -86,7 +86,7 @@ def test_auth_protects_reads_writes_and_artifacts(settings):
     secured = settings.model_copy(
         update={"api_token": __import__("pydantic").SecretStr("private-test-token")}
     )
-    with TestClient(create_app(secured)) as client:
+    with TestClient(create_app(secured), base_url="http://127.0.0.1") as client:
         assert client.get("/healthz").status_code == 200
         assert client.get("/api/config").status_code == 401
         assert client.post("/api/demo", json={"scenario": "overlay"}).status_code == 401
@@ -120,7 +120,7 @@ def test_webhook_signature_and_duplicate_delivery(settings):
     }
     raw = json.dumps(event).encode()
     signature = "sha256=" + hmac.new(b"webhook-secret", raw, hashlib.sha256).hexdigest()
-    with TestClient(create_app(settings)) as client:
+    with TestClient(create_app(settings), base_url="http://127.0.0.1") as client:
         assert client.post("/api/webhooks/github", content=raw).status_code == 401
         headers = {"X-Hub-Signature-256": signature, "X-GitHub-Event": "workflow_run"}
         first = client.post("/api/webhooks/github", content=raw, headers=headers)
@@ -136,3 +136,84 @@ def test_webhook_signature_and_duplicate_delivery(settings):
 
 def test_unknown_demo_scenario_rejected(client):
     assert client.post("/api/demo", json={"scenario": "arbitrary_shell"}).status_code == 422
+
+
+@pytest.mark.parametrize(
+    "origin",
+    [
+        "https://127.0.0.1",
+        "http://localhost:5173",
+        "http://127.0.0.1:8787",
+        "ftp://127.0.0.1",
+        "null",
+        "http://127.0.0.1:invalid",
+        "http://[invalid",
+        "http://user@127.0.0.1",
+        "http://127.0.0.1/path",
+    ],
+)
+def test_cross_origin_or_malformed_requests_cannot_create_cases(client, origin):
+    response = client.post("/api/demo", json={"scenario": "overlay"}, headers={"Origin": origin})
+    assert response.status_code == 403
+    assert client.get("/api/investigations").json() == []
+    assert response.headers["X-Content-Type-Options"] == "nosniff"
+    assert response.headers["Cache-Control"] == "no-store"
+
+
+def test_same_origin_including_default_port_is_accepted(client):
+    response = client.post(
+        "/api/demo", json={"scenario": "overlay"}, headers={"Origin": "http://127.0.0.1:80"}
+    )
+    assert response.status_code == 201
+
+
+def test_development_proxy_preserves_same_origin(client):
+    response = client.post(
+        "/api/demo",
+        json={"scenario": "overlay"},
+        headers={"Host": "localhost:5173", "Origin": "http://localhost:5173"},
+    )
+    assert response.status_code == 201
+
+
+def test_testserver_is_not_a_production_host_exception(client):
+    assert client.get("/api/investigations", headers={"Host": "testserver"}).status_code == 403
+
+
+@pytest.mark.parametrize(
+    "host", ["[invalid", "localhost:invalid", "user@localhost", "localhost/path"]
+)
+def test_malformed_host_is_rejected_without_server_error(client, host):
+    response = client.get("/api/config", headers={"Host": host})
+    assert response.status_code == 403
+    assert response.headers["Cache-Control"] == "no-store"
+
+
+def test_duplicate_origin_headers_are_rejected(client):
+    response = client.post(
+        "/api/demo",
+        json={"scenario": "overlay"},
+        headers=[("Origin", "http://127.0.0.1"), ("Origin", "https://attacker.example")],
+    )
+    assert response.status_code == 403
+    assert client.get("/api/investigations").json() == []
+
+
+def test_non_ascii_bearer_header_is_unauthorized(settings):
+    from pydantic import SecretStr
+
+    secured = settings.model_copy(update={"api_token": SecretStr("private-test-token")})
+    with TestClient(create_app(secured), base_url="http://127.0.0.1") as client:
+        response = client.get("/api/config", headers=[(b"authorization", b"Bearer \xff")])
+        assert response.status_code == 401
+
+
+def test_non_ascii_webhook_signature_is_unauthorized(settings):
+    from pydantic import SecretStr
+
+    secured = settings.model_copy(update={"webhook_secret": SecretStr("webhook-secret")})
+    with TestClient(create_app(secured), base_url="http://127.0.0.1") as client:
+        response = client.post(
+            "/api/webhooks/github", content=b"{}", headers=[(b"x-hub-signature-256", b"\xff")]
+        )
+        assert response.status_code == 401

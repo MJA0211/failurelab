@@ -1,5 +1,8 @@
 # Implementation verification
 
+For the security patch's checks, see [v0.1.1 verification](releases/v0.1.1.md).
+The measurements below record the initial implementation.
+
 Verified locally on September 11–12, 2026, on Windows with Python 3.11.5,
 Node 22.20.0, uv 0.12.6, and Playwright Chromium 151.0.7922.34.
 

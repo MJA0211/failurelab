@@ -8,6 +8,29 @@ from failurelab.fixtures import fixture
 from failurelab.integrations import GitHub, IntegrationError, npm_metadata, read_archive
 
 
+@pytest.mark.parametrize("operation", ["get", "download"])
+def test_github_stops_reading_at_limit_and_closes_stream(settings, operation):
+    class OversizedStream(httpx.SyncByteStream):
+        closed = False
+
+        def __iter__(self):
+            yield b"x" * 2048
+            raise AssertionError("Read beyond the ingestion limit")
+
+        def close(self):
+            self.closed = True
+
+    stream = OversizedStream()
+    bounded = settings.model_copy(update={"max_artifact_bytes": 1024})
+    github = GitHub(bounded, httpx.MockTransport(lambda _: httpx.Response(200, stream=stream)))
+    try:
+        with pytest.raises(IntegrationError, match="limit"):
+            getattr(github, operation)("/download")
+        assert stream.closed
+    finally:
+        github.close()
+
+
 def test_github_allowlist_and_exact_commit(settings):
     settings = settings.model_copy(update={"github_repositories": "owner/repo"})
     requests = []
