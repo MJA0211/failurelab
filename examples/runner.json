@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "interventions": {
+    "remove_overlay": {"env": {"FAILURELAB_DISABLE_OVERLAY": "1"}},
+    "restore_selector": {"env": {"FAILURELAB_RESTORE_SELECTOR": "1"}},
+    "restore_response": {"env": {"FAILURELAB_RESTORE_RESPONSE": "1"}}
+  }
+}

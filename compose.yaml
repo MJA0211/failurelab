@@ -1,0 +1,21 @@
+services:
+  failurelab:
+    build: .
+    ports:
+      - "127.0.0.1:8787:8787"
+    environment:
+      FAILURELAB_API_TOKEN: ${FAILURELAB_API_TOKEN:?Set a random FAILURELAB_API_TOKEN before starting Docker}
+      FAILURELAB_MODEL_MODE: ${FAILURELAB_MODEL_MODE:-baseline}
+      FAILURELAB_MODEL_API_KEY: ${FAILURELAB_MODEL_API_KEY:-}
+      FAILURELAB_MODEL_BASE_URL: ${FAILURELAB_MODEL_BASE_URL:-https://router.huggingface.co/v1}
+      FAILURELAB_MODEL_NAME: ${FAILURELAB_MODEL_NAME:-Qwen/Qwen3-VL-4B-Instruct}
+      FAILURELAB_GITHUB_TOKEN: ${FAILURELAB_GITHUB_TOKEN:-}
+      FAILURELAB_GITHUB_REPOSITORIES: ${FAILURELAB_GITHUB_REPOSITORIES:-}
+      FAILURELAB_WEBHOOK_SECRET: ${FAILURELAB_WEBHOOK_SECRET:-}
+    volumes:
+      - failurelab-data:/app/var
+    shm_size: 1gb
+    init: true
+    restart: unless-stopped
+volumes:
+  failurelab-data:
