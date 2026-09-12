@@ -1,0 +1,58 @@
+name: Dependency graph SBOM
+on:
+  push:
+    branches: [master]
+    paths:
+      - pyproject.toml
+      - uv.lock
+      - frontend/package.json
+      - frontend/package-lock.json
+      - .github/workflows/**
+      - .github/dependabot.yml
+  workflow_dispatch:
+  schedule:
+    - cron: "43 10 * * 1"
+permissions:
+  contents: read
+concurrency:
+  group: dependency-graph-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      # GitHub's native dependency graph jobs resolve uv.lock and package-lock.json.
+      # Export their current graph instead of submitting a competing partial snapshot.
+      - name: Export repository dependency graph
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api "repos/$GITHUB_REPOSITORY/dependency-graph/sbom" > dependency-graph-response.json
+      - name: Verify ecosystems and write SPDX artifact
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          sbom = json.loads(Path("dependency-graph-response.json").read_text())["sbom"]
+          purls = [
+              ref["referenceLocator"]
+              for package in sbom["packages"]
+              for ref in package.get("externalRefs", [])
+              if ref["referenceType"] == "purl"
+          ]
+          for ecosystem in ("pypi", "npm"):
+              if not any(purl.startswith(f"pkg:{ecosystem}/") for purl in purls):
+                  raise SystemExit(f"Dependency graph is missing the {ecosystem} ecosystem")
+          Path("failurelab.spdx.json").write_text(json.dumps(sbom, indent=2) + "\n")
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as summary:
+              summary.write(f"Exported {len(sbom['packages'])} packages from GitHub's current dependency graph.\n")
+              summary.write("Graph ingestion is asynchronous; this export is not an exact-commit attestation.\n")
+          PY
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: failurelab-dependency-graph-spdx
+          path: failurelab.spdx.json
+          if-no-files-found: error
+          retention-days: 14

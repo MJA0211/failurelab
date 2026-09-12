@@ -136,6 +136,7 @@ flowchart LR
 - [Security model](SECURITY.md)
 - [Portfolio walkthrough](docs/portfolio.md)
 - [Executed verification and measured limits](docs/verification.md)
+- [GitHub security and quality automation](docs/github-automation.md)
 - Interactive API reference: `/docs`; OpenAPI specification: `/openapi.json`.
 
 ## Boundaries
