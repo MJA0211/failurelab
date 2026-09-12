@@ -8,7 +8,9 @@ import httpx
 
 from failurelab.schemas import ExperimentPlan, ExperimentResult
 
-RUNNER_VERSION = "fixture-runner-v1"
+RUNNER_VERSION = "fixture-runner-v2"
+# Both experimental conditions use the same bounded actionability budget.
+ACTION_TIMEOUT_MS = 3000
 HTML = """<!doctype html><html><head><meta charset="utf-8"><style>
 body{font:16px system-ui;margin:0;background:#f5f5f1;color:#162622}header{padding:25px 45px;border-bottom:1px solid #ddd;display:flex;justify-content:space-between}
 main{max-width:850px;margin:65px auto}h1{font-size:42px;letter-spacing:-2px}button{background:#176b50;color:white;border:0;border-radius:8px;padding:16px 36px;font:inherit;cursor:pointer}
@@ -53,10 +55,10 @@ def check(page, scenario):
 
     try:
         if scenario == "overlay":
-            page.get_by_test_id("checkout").click(timeout=400)
+            page.get_by_test_id("checkout").click(timeout=ACTION_TIMEOUT_MS)
             return page.locator("#success").inner_text() == "Order placed", "checkout interaction"
         if scenario == "selector":
-            page.get_by_test_id("search-input").fill("notebook", timeout=400)
+            page.get_by_test_id("search-input").fill("notebook", timeout=ACTION_TIMEOUT_MS)
             return True, "search locator resolved"
         if scenario == "api_contract":
             return page.locator("#account").inner_text() == "Ada", "account response rendered"
@@ -96,7 +98,9 @@ def run_fixture(store, case_id, scenario, plan: ExperimentPlan) -> ExperimentRes
     from playwright.sync_api import sync_playwright
 
     identity = hashlib.sha256(
-        (scenario + plan.model_dump_json() + HTML + RUNNER_VERSION).encode()
+        (
+            scenario + plan.model_dump_json() + HTML + RUNNER_VERSION + str(ACTION_TIMEOUT_MS)
+        ).encode()
     ).hexdigest()[:10]
     name = f"{plan.hypothesis_id}-{plan.intervention}-{identity}"
     result_path = store.artifact_path(case_id, name + ".json")
@@ -148,6 +152,7 @@ def run_fixture(store, case_id, scenario, plan: ExperimentPlan) -> ExperimentRes
         artifacts=artifacts,
         environment={
             "runner": RUNNER_VERSION,
+            "action_timeout_ms": str(ACTION_TIMEOUT_MS),
             "chromium": version,
             "platform": platform.platform(),
             "fixture_sha256": hashlib.sha256(HTML.encode()).hexdigest(),
