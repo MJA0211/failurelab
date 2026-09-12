@@ -1,7 +1,8 @@
 import pytest
 
+from failurelab import runner
 from failurelab.fixtures import fixture
-from failurelab.runner import run_experiment, run_fixture, verdict
+from failurelab.runner import check, run_experiment, run_fixture, setup_page, verdict
 from failurelab.schemas import ExperimentPlan
 from failurelab.workflow import Investigator, Worker
 
@@ -85,13 +86,59 @@ def test_real_browser_interventions(store, scenario, intervention):
         repetitions=2,
     )
     result = run_fixture(store, case_id, scenario, plan)
-    assert result.baseline_passes == 0
-    assert result.intervention_passes == 2
-    assert result.verdict == "supported"
+    assert result.baseline_passes == 0, result.observations
+    assert result.intervention_passes == 2, result.observations
+    assert result.verdict == "supported", result.observations
     assert len(result.artifacts) == 4
     for name in result.artifacts:
         assert store.artifact_path(case_id, name).stat().st_size > 0
     assert run_fixture(store, case_id, scenario, plan) == result
+
+
+@pytest.mark.browser
+@pytest.mark.parametrize("scenario", ["overlay", "selector"])
+def test_browser_check_waits_for_delayed_actionability(scenario):
+    from playwright.sync_api import sync_playwright
+
+    with sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        try:
+            page = browser.new_page()
+            page.route("**/*", lambda route: route.abort())
+            setup_page(page, "api_contract")
+            target = "checkout" if scenario == "overlay" else "search-input"
+            page.get_by_test_id(target).evaluate(
+                """element => {
+                    element.disabled = true;
+                    setTimeout(() => { element.disabled = false; }, 600);
+                }"""
+            )
+            passed, observation = check(page, scenario)
+            assert passed, observation
+            if scenario == "overlay":
+                assert page.locator("#success").inner_text() == "Order placed"
+            else:
+                assert page.get_by_test_id(target).input_value() == "notebook"
+        finally:
+            browser.close()
+
+
+@pytest.mark.browser
+def test_browser_cache_changes_with_action_budget(store, monkeypatch):
+    case_id, _ = store.create(fixture("api_contract"), source="demo", scenario="api_contract")
+    plan = ExperimentPlan(
+        hypothesis_id="h1",
+        intervention="restore_response",
+        rationale="Check cache provenance",
+        repetitions=2,
+    )
+    first = run_fixture(store, case_id, "api_contract", plan)
+    monkeypatch.setattr(runner, "ACTION_TIMEOUT_MS", runner.ACTION_TIMEOUT_MS + 100)
+    second = run_fixture(store, case_id, "api_contract", plan)
+    assert first.environment["action_timeout_ms"] != second.environment["action_timeout_ms"]
+    assert set(first.artifacts).isdisjoint(second.artifacts)
+    assert first.verdict == second.verdict == "supported"
+    assert run_fixture(store, case_id, "api_contract", plan) == second
 
 
 @pytest.mark.browser
