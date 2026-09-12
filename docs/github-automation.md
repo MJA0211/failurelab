@@ -13,9 +13,11 @@ to execute pull-request code.
 | Dependency graph SBOM | Manifest or workflow changes on master, Monday schedule, manual | Validates Python/npm presence in GitHub's graph and archives an SPDX SBOM |
 | Dependabot updates | Weekly on Monday at 09:00 America/New_York | Update pull requests for uv, npm, GitHub Actions, and Docker |
 
-Dependabot groups minor and patch updates for Python, npm, and Actions. Major updates
-remain separate. Update pull requests require review; these workflows do not merge
-them automatically. Dependabot security updates remain enabled independently of the
+Dependabot groups minor and patch updates for Python, npm, and Actions. Vite and
+`@vitejs/plugin-react` are grouped for all version updates because their peer
+dependencies must agree. Other major updates remain separate. Update pull requests
+require review; these workflows do not merge them automatically. Dependabot security
+updates remain enabled independently of the
 weekly version-update schedule.
 
 GitHub already resolves the Python lockfile through its managed Dependency Graph
@@ -27,6 +29,13 @@ Quality artifacts and SBOMs are retained for 14 days. Browser screenshots and tr
 used in quality checks come from owned fixtures; local runtime state and credentials
 are not uploaded. The Python audit covers installed dependencies in each CI environment,
 not optional model or PostgreSQL packages that were not installed.
+
+The owned browser runner allows 3,000 ms for a click or fill to become actionable,
+with the same budget for baseline and intervention runs. Playwright's actionability
+checks remain enabled. Blocked controls still fail, and mixed outcomes remain
+inconclusive. The runner version and timeout are included in the experiment cache
+identity, and the timeout is recorded in the result environment. Regression tests
+cover delayed controls, blocked baselines, incorrect interventions, and cache changes.
 
 Inspect CodeQL results in the repository's Security tab. A completed analysis means
 the scanner ran and uploaded results; review any resulting alerts separately. Check
