@@ -6,7 +6,6 @@ and runs controlled browser experiments before supporting a finding.
 ![FailureLab investigation workspace](docs/screenshots/dashboard.png)
 
 [Watch the recorded demo](docs/walkthrough.webm) ·
-[Portfolio evidence and walkthrough](docs/portfolio.md) ·
 [Latest quality checks](https://github.com/MJA0211/failurelab/actions/workflows/ci.yml)
 
 ## Run it
@@ -140,7 +139,6 @@ flowchart LR
 - [Evaluation methodology and failure cases](docs/evaluation.md)
 - [Data provenance and research sources](DATA_SOURCES.md)
 - [Security model](SECURITY.md)
-- [Portfolio walkthrough](docs/portfolio.md)
 - [Executed verification and measured limits](docs/verification.md)
 - [GitHub security and quality automation](docs/github-automation.md)
 - Interactive API reference: `/docs`; OpenAPI specification: `/openapi.json`.
