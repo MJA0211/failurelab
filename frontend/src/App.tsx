@@ -19,7 +19,6 @@ import {
   FileText,
   FlaskConical,
   GitBranch,
-  Github,
   Layers3,
   LoaderCircle,
   LockKeyhole,
@@ -35,6 +34,7 @@ import {
   X,
   XCircle,
 } from "lucide-react";
+import { Github } from "./Github";
 import { api, download, request } from "./api";
 import type { Case, Config, Evaluation, Evidence } from "./types";
 
