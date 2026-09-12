@@ -214,6 +214,13 @@ checks passing. Version `0.1.2` is prepared on the validation branch. Release re
 still requires completing the updated live check and reviewing the new PR. No
 `v0.1.2` tag or release was created; existing tags were not changed.
 
+[Draft PR #14](https://github.com/MJA0211/failurelab/pull/14) contains the validation
+and integration fixes. The publication diff excludes `.env`, runtime databases,
+checkpoints, raw traces, and the local portfolio document. Gitleaks reported one
+finding: the SHA-256 value for `src/api.js` in the frozen ground truth. Recomputing
+the file hash confirmed it is source provenance, not a credential. The record was
+preserved, and no scanner rule was disabled.
+
 ## Reproduction
 
 The script requires the configured model key and GitHub CLI permission to read the

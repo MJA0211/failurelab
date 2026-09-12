@@ -105,7 +105,7 @@ Reproduce with `uv run python scripts/load_smoke.py` while the local server is r
 |---|---|---|
 | Chat/vision inference | Text diagnosis and planning exercised with real provider calls; see [live verification](live-agent-verification.md) | Vision inference, other models/providers, and held-out model quality |
 | Neural retrieval | Actual sentence-transformer and cross-encoder adapter | Optional model installation/download and quality benchmark |
-| GitHub ingestion | Live public metadata; logs, artifacts, redirects, version pinning, and failures tested through controlled HTTP responses | Private repository credentials and retained production artifacts |
+| GitHub ingestion | Actual failed public workflow, job logs, source, and browser artifacts imported and investigated; bounded downloads, redirects, and failure handling also have contract tests | Private repositories and GitHub-delivered webhooks to a public endpoint |
 | Linux repository runner | Actual reviewed repository checkout, unchanged browser assertions, HTTP authentication/replay, and artifact return in a disposable GitHub-hosted Linux VM; see [validation](unfamiliar-ci-validation.md) | Permanent private endpoint, strict public egress isolation, and arbitrary untrusted-repository deployment |
 | PostgreSQL | Store/checkpointer adapter and configuration | Running PostgreSQL service |
 | Docker | Dockerfile/Compose definition | Docker engine unavailable in this implementation environment |
