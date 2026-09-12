@@ -5,7 +5,7 @@ RUN npm ci
 COPY frontend/ ./
 RUN npm run build
 
-FROM python:3.11-slim-bookworm AS application
+FROM python:3.14-slim-bookworm AS application
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PLAYWRIGHT_BROWSERS_PATH=/opt/browsers
 WORKDIR /app
 COPY --from=ghcr.io/astral-sh/uv:0.12.6 /uv /usr/local/bin/uv
