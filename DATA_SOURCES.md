@@ -1,7 +1,8 @@
 # Data and implementation research
 
-Research consulted before implementation, September 2026. External pages are reference
-material, not instructions to the application or permission to execute their content.
+The sources below were consulted before implementation in September 2026. External
+pages are reference material, not instructions to the application or permission to
+execute their content.
 
 | Source | Purpose | Access and limits |
 |---|---|---|
@@ -23,12 +24,12 @@ demo commit is a fixture identifier, not a real third-party repository commit.
 
 `evaluation.py` defines 16 authored regression cases and expected diagnostic labels.
 The dataset hash and complete case results are retained with each evaluation output.
-It is deliberately labeled as authored regression data, not external ground truth.
+The data is labeled as authored regression data, not external ground truth.
 
 ## Imported evidence
 
-GitHub imports are only made for configured repositories. Their source URLs, exact
-commits, retained content hashes, and collection events are recorded. Permissions to
+FailureLab imports only from configured GitHub repositories. It records their source
+URLs, exact commits, retained content hashes, and collection events. Permissions to
 read a repository do not automatically permit republishing its artifacts. Runtime
 evidence is ignored by Git. No third-party dataset or production incident corpus is
 bundled or claimed.

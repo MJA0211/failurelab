@@ -18,12 +18,13 @@ Discuss historical context leakage, exact identifier retrieval, deterministic to
 contracts, unavailable evidence, idempotency across crashes, separate code execution,
 provider failure behavior, human overrides, and model quality versus system correctness.
 
-The project maps to current applied AI role requirements for retrieval, agent tools,
-typed outputs, evals, observability, deployment, and reliability. Example research:
+The project covers retrieval, agent tools, typed outputs, evals, observability,
+deployment, and reliability, which appear in current applied AI role requirements.
+Job descriptions consulted for this project include:
 [Fluency AI Engineer](https://jobs.ashbyhq.com/fluency/9a83146e-e32d-4e0c-84b5-59996a58a821/),
 [Build Harness & Evals](https://jobs.ashbyhq.com/build/cdf0c29b-157e-4b85-a767-e72211022c96/),
 [Notion Agent Dev Velocity](https://jobs.ashbyhq.com/notion/c565d3b0-0dcf-4bcd-b29b-4168479ac78e/).
-These links were used for project relevance research; openings may change.
+These job descriptions informed the project's relevance research; openings may change.
 
 ## Resume claims
 

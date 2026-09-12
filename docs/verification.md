@@ -66,8 +66,9 @@ Reproduce with `uv run python scripts/load_smoke.py` while the local server is r
 | PostgreSQL | Store/checkpointer adapter and configuration | Running PostgreSQL service |
 | Docker | Dockerfile/Compose definition | Docker engine unavailable in this implementation environment |
 
-These conditions are not replaced with simulated success. The local default advertises
-baseline mode and owned fixtures, and it refuses to execute imported repository code.
+The untested paths remain unverified; simulated success does not replace these checks.
+The local default labels baseline mode and owned fixtures and refuses to execute
+imported repository code.
 No real-world model accuracy, user time savings, distributed throughput, or deployed
 cloud-service claim is made.
 

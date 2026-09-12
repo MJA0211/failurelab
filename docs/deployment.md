@@ -14,7 +14,7 @@ Set a random FAILURELAB_API_TOKEN in `.env`, then run `docker compose up --build
 The multi-stage image builds the frontend, installs the pinned Python environment
 and Chromium, and runs as UID 10001. Compose maps only the loopback port and persists
 `/app/var`. A non-loopback application bind refuses to start without an API token.
-The browser asks for the token; it is kept in sessionStorage for that tab session.
+The browser asks for the token and keeps it in sessionStorage for that tab session.
 
 Docker is not installed in the implementation environment, so the container definition
 has not been executed here. Verify the image health check, mounted-volume permissions,
@@ -44,8 +44,8 @@ a conditional update, while the queue scans eligible jobs in creation order. Mon
 claim contention, connection counts, disk IO, queue age, and failed attempts. SQLite
 is intended for one machine and one worker; do not share its files over network storage.
 
-This repository does not claim that PostgreSQL or distributed deployment was exercised
-locally. Test those adapters with a disposable database in the deployment environment.
+PostgreSQL and distributed deployment have not been exercised locally. Test those
+adapters with a disposable database in the deployment environment.
 
 ## Backups and retention
 

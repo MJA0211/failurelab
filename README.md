@@ -1,7 +1,7 @@
 # FailureLab
 
-**Evidence over guesswork.** A CI investigation workspace that retrieves evidence,
-proposes causes, and runs controlled browser experiments before supporting a finding.
+FailureLab is a CI investigation workspace. It retrieves evidence, proposes causes,
+and runs controlled browser experiments before supporting a finding.
 
 ![FailureLab investigation workspace](docs/screenshots/dashboard.png)
 
@@ -31,7 +31,7 @@ uv run failurelab evaluate
 uv run failurelab serve
 ```
 
-Four owned incidents are seeded once. The worker runs actual Chromium experiments
+The app seeds four owned incidents once. The worker runs Chromium experiments
 for an overlay, a selector change, and an API response mismatch. A fourth incident
 demonstrates abstention when artifacts are missing. Startup takes a few seconds
 while browser runs finish. Incidents, evidence, screenshots, traces, checkpoints,
@@ -55,11 +55,10 @@ reviews, and results persist under `var/`.
 
 ## Modes are explicit
 
-**Baseline** is a deterministic diagnostic signature engine. It does not masquerade
-as an LLM. Its local browser experiments really execute, but its examples are
-synthetic. **Chat** uses a real model provider. Provider errors stop the workflow;
-the system never silently substitutes the baseline. The model never assigns the
-final experimental status.
+**Baseline** uses deterministic diagnostic signatures without an LLM. It executes
+local browser experiments on synthetic examples. **Chat** uses a real model provider.
+Provider errors stop the workflow; the system never silently substitutes the baseline.
+The model never assigns the final experimental status.
 
 Copy `.env.example` to `.env` to configure integrations. Empty optional values use
 their documented defaults. Secrets remain server-side and `.env` is Git-ignored.
@@ -90,7 +89,8 @@ FAILURELAB_RETRIEVAL_MODE=hybrid
 ```
 
 This downloads `BAAI/bge-small-en-v1.5` and a MiniLM cross-encoder on first use.
-CPU inference is supported. The app never labels lexical retrieval as vector search.
+The models support CPU inference. The app keeps lexical retrieval and vector search
+distinct in its labels.
 
 ## Verify
 

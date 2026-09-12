@@ -9,14 +9,15 @@ A worker claims a queued case with a compare-and-swap update. The lease renews e
 attempts are allowed before explicit manual retry.
 
 The LangGraph sequence is `collect → retrieve → diagnose → plan → execute → report`.
-SQLite checkpoints are used locally; PostgreSQL checkpoints are selected when the
-database URL is PostgreSQL. A restarted worker reads the same investigation thread
+The workflow uses SQLite checkpoints locally and selects PostgreSQL checkpoints when
+the database URL is PostgreSQL. A restarted worker reads the same investigation thread
 and resumes from its last checkpoint. Events have unique stage keys. Owned experiment
 results are atomically written and reused when a node replays.
 
-Failure after an external operation but before checkpoint commit can replay that
-operation. External runners therefore receive idempotency keys. This is at-least-once
-execution with idempotent effects, not a claim of universal exactly-once execution.
+If a failure occurs after an external operation but before the checkpoint commits,
+recovery can replay that operation. External runners receive idempotency keys to
+handle these replays. This is at-least-once execution with idempotent effects, not a
+claim of universal exactly-once execution.
 
 ## Agents and retrieval
 
@@ -32,10 +33,10 @@ Pydantic validates hypotheses, citation IDs, experiment references, counts, and 
 names. A generated `supported` status is discarded before verification. Document
 instructions are untrusted content; the model has no shell tool.
 
-The baseline engine recognizes explicit failure signatures in logs. It is intentionally
-simple and labeled in every report. Retrieval and screenshot adapters are implemented
-but the baseline does not pretend to interpret pixels. Chat mode can send a screenshot
-to a vision-capable provider.
+The baseline engine recognizes explicit failure signatures in logs. It uses a simple
+approach, labeled in every report. Retrieval and screenshot adapters are implemented,
+but the baseline does not interpret pixels. Chat mode can send a screenshot to a
+vision-capable provider.
 
 ## Verification
 
@@ -66,8 +67,9 @@ reports. Reviews append an opinion without rewriting evidence or experimental ou
 
 ## Deliberate operational scope
 
-One workspace, one trust domain. SQLite supports the local single-worker deployment.
-PostgreSQL supports separate API and worker processes, but all workers must share
-artifact storage. The provided application uses a filesystem artifact store; a shared
+The application has one workspace and one trust domain. SQLite supports the local
+single-worker deployment. PostgreSQL supports separate API and worker processes, but
+all workers must share artifact storage. The provided application uses a filesystem
+artifact store; a shared
 mounted volume is required for distributed workers. Database and filesystem backup
 must be coordinated. No unmeasured million-document or high-concurrency claim is made.

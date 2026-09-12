@@ -1,5 +1,7 @@
 .venv/
 .env
+.env.*
+!.env.example
 __pycache__/
 .pytest_cache/
 .ruff_cache/
@@ -13,3 +15,36 @@ frontend/playwright-report/
 *.egg-info/
 coverage.xml
 *.tsbuildinfo
+
+# Local databases, checkpoints, and generated browser output
+*.db
+*.db-*
+*.sqlite
+*.sqlite-*
+*.sqlite3
+*.sqlite3-*
+checkpoints/
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+
+# Model downloads and local caches
+.cache/
+.huggingface/
+.hf_home/
+model-cache/
+models/
+ms-playwright/
+
+# Credentials and machine-specific editor/OS state
+.aws/
+.ssh/
+.npmrc
+*.pem
+*.key
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+Desktop.ini

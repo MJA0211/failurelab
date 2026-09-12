@@ -5,8 +5,8 @@
 `uv run pytest` runs deterministic component/API tests, service contract tests,
 checkpoint recovery, browser interventions, and UI acceptance. The browser suite
 asserts both failure and success, preserves traces, tests a wrong intervention,
-and checks actual report review/export on desktop and mobile. Assertions that an
-unknown case stays inconclusive are as important as positive diagnoses.
+and checks report review/export on desktop and mobile. Checking that an unknown case
+stays inconclusive matters as much as checking a positive diagnosis.
 
 Coverage is a diagnostic measure, not evidence of model quality. Optional external
 services require their own acceptance runs in the intended deployment environment.
@@ -19,15 +19,15 @@ and unknown mechanisms. Negative cases include missing artifacts and instruction
 text in a runbook. Results include Top-1/Top-3 labels, valid citation IDs, abstention,
 case-level outputs, a dataset hash, and a Wilson interval.
 
-This is a regression set designed alongside the baseline. A high score is expected
-and cannot substantiate generalization. It is not a held-out benchmark; no percentage
+The regression set was designed alongside the baseline, so a high score is expected
+and cannot establish generalization. It is not a held-out benchmark; no percentage
 from this set should be represented as production accuracy. Valid citation IDs do not
 establish textual entailment. Cases are small and mechanisms overlap; confidence
 intervals should not be interpreted as independent real-world sampling guarantees.
 
 The current baseline uses logs to recognize known signatures, so retrieving supporting
-context need not improve its classification. Reporting that lack of improvement is
-intentional. The benchmark must not fabricate a RAG uplift.
+context need not improve its classification. The benchmark reports that lack of
+improvement; it must not fabricate a RAG uplift.
 
 ## Live model evaluation
 

@@ -15,16 +15,17 @@ Public endpoints may work without a token; artifact downloads commonly require a
 Never use a token with administration permissions just to investigate CI failures.
 
 Open New investigation → GitHub Actions and supply the numeric workflow run ID.
-Supply the optional exact Playwright test title when remote reproduction is intended;
+Supply the optional exact Playwright test title when requesting remote reproduction;
 otherwise the workflow name is retained as the investigation label. Webhook-created
 cases use the workflow name; create a manual snapshot with the exact test title before
 requesting a targeted repository reproduction.
-FailureLab collects metadata first, then the worker collects failed jobs for that run
+FailureLab collects metadata first. The worker then collects failed jobs for that run
 attempt, commit patches at the exact SHA, and available artifacts. Missing/expired
-artifacts are recorded as warnings rather than invented evidence. Retained text is
-bounded and redacted. The first 12 changed file patches, four failed job logs, and
-three bounded artifact archives are ingested; these limits may omit relevant evidence
-and must be considered during review. Truncation preserves the tail of logs.
+artifacts produce warnings; FailureLab does not invent the missing evidence. Retained
+text is bounded and redacted. Ingestion includes the first 12 changed file patches,
+four failed job logs, and three bounded artifact archives. These limits may omit
+relevant evidence and must be considered during review. Truncation preserves the tail
+of logs.
 
 Webhook URL: `https://your-host/api/webhooks/github`; event: **Workflow runs**;
 content type: JSON; secret: the configured value. Failed or timed-out completed runs
@@ -38,8 +39,8 @@ deep. Storage redirects use a credential-free client and a GitHub storage host a
 ## npm
 
 The integrations screen requests `GET https://registry.npmjs.org/<package>/<version>`
-and displays bounded selected fields. Supply the exact installed version from the
-lockfile, not an assumed latest version. This is an analyst tool; it does not
+and displays a bounded selection of fields. Supply the exact installed version from
+the lockfile, not an assumed latest version. This is an analyst tool; it does not
 automatically rewrite dependency versions or claim to resolve incompatibilities.
 
 ## Model provider
@@ -49,9 +50,9 @@ temperature zero, bounded output tokens, and an optional PNG. It requires a prov
 that supports chat-completion JSON responses. Credentials remain server-side.
 Non-200 responses and invalid model outputs fail the investigation explicitly.
 
-Set input/output prices per million tokens to enable estimated model cost. Missing
-pricing stays unknown. Cost excludes hosting, retrieval, and browser execution.
-Token counts are provider-reported. Durable events and report usage provide local
+Set input/output prices per million tokens to estimate model cost. Cost stays unknown
+when pricing is missing and excludes hosting, retrieval, and browser execution.
+The provider reports token counts. Durable events and report usage provide local
 LLMOps observability without requiring another external service.
 
 ## Optional hybrid retrieval
