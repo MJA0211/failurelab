@@ -72,12 +72,13 @@ def test_execution_boundary_rejects_invalid_git_arguments_even_without_model_val
         runner_service.execute(request, "b" * 64)
 
 
-def test_git_option_terminator_treats_option_shaped_repository_as_data(tmp_path):
+def test_git_option_terminator_treats_option_shaped_repository_as_data(tmp_path, monkeypatch):
     import os
     import subprocess
 
+    monkeypatch.setenv("GIT_DIR", str(tmp_path / "unexpected.git"))
     env = {
-        **os.environ,
+        **{key: value for key, value in os.environ.items() if not key.upper().startswith("GIT_")},
         "GIT_CONFIG_NOSYSTEM": "1",
         "GIT_CONFIG_GLOBAL": os.devnull,
         "GIT_TERMINAL_PROMPT": "0",
@@ -91,6 +92,8 @@ def test_git_option_terminator_treats_option_shaped_repository_as_data(tmp_path)
         capture_output=True,
         timeout=10,
     )
+    assert (tmp_path / ".git").is_dir()
+    assert not (tmp_path / "unexpected.git").exists()
     result = subprocess.run(
         ["git", "-c", "protocol.file.allow=never", "fetch", "--depth=1", "--", "--help", "a" * 40],
         cwd=tmp_path,
