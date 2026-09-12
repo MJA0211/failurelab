@@ -1,5 +1,14 @@
 # Implementation verification
 
+## Live provider update: September 12, 2026
+
+Both agent stages completed real provider calls on four owned fixtures, with three
+supported browser interventions and one missing-evidence abstention after a prompt
+correction. The application suite passed 122 tests. The subsequent larger live
+evaluation stopped on HTTP 402; it has no completed score. See the
+[live verification record](live-agent-verification.md) for the model, measured results,
+initial failure, and reproduction commands. The sections below retain earlier results.
+
 ## Portfolio update: September 12, 2026
 
 The boundary-hardening update passed **121 local tests** in 74.82 seconds on Windows
@@ -86,7 +95,7 @@ Reproduce with `uv run python scripts/load_smoke.py` while the local server is r
 
 | Path | Implemented and locally checked | External condition not exercised here |
 |---|---|---|
-| Chat/vision inference | HTTP request/schema/citation/budget contracts tested with controlled responses | Real provider credentials and model inference |
+| Chat/vision inference | Text diagnosis and planning exercised with real provider calls; see [live verification](live-agent-verification.md) | Vision inference, other models/providers, and held-out model quality |
 | Neural retrieval | Actual sentence-transformer and cross-encoder adapter | Optional model installation/download and quality benchmark |
 | GitHub ingestion | Live public metadata; logs, artifacts, redirects, version pinning, and failures tested through controlled HTTP responses | Private repository credentials and retained production artifacts |
 | Linux repository runner | Implemented checkout, manifest validation, test identity checks, and bounded subprocess execution; parser/manifest/client contracts tested | Disposable Linux VM and a reviewed target repository |

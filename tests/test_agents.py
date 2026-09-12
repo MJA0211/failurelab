@@ -113,6 +113,46 @@ def test_malformed_provider_output_rejected(settings):
         Agents(chat_settings(settings)).diagnose(fixture("overlay")["evidence"])
 
 
+@respx.mock
+def test_live_planner_must_abstain_for_unknown_cause(settings):
+    evidence = fixture("unknown")["evidence"]
+    diagnosis = baseline_diagnosis(evidence)
+    endpoint = respx.post("https://models.example/v1/chat/completions")
+    endpoint.mock(
+        return_value=httpx.Response(
+            200,
+            json={
+                "choices": [
+                    {
+                        "message": {
+                            "content": json.dumps(
+                                {
+                                    "experiments": [
+                                        {
+                                            "hypothesis_id": "h1",
+                                            "intervention": "remove_overlay",
+                                            "rationale": "The runbook mentions overlays, so try removing one.",
+                                            "repetitions": 3,
+                                        }
+                                    ]
+                                }
+                            )
+                        }
+                    }
+                ],
+            },
+        )
+    )
+    with pytest.raises(RuntimeError, match="unknown cause cannot authorize"):
+        Agents(chat_settings(settings)).plan(diagnosis, evidence)
+    endpoint.mock(
+        return_value=httpx.Response(
+            200, json={"choices": [{"message": {"content": '{"experiments": []}'}}]}
+        )
+    )
+    assert Agents(chat_settings(settings)).plan(diagnosis, evidence).experiments == []
+
+
 def test_evaluation_is_measured_and_labeled(settings):
     report = evaluate(settings)
     assert report["case_count"] == 16

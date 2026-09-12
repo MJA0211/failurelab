@@ -65,6 +65,11 @@ local browser experiments on synthetic examples. **Chat** uses a real model prov
 Provider errors stop the workflow; the system never silently substitutes the baseline.
 The model never assigns the final experimental status.
 
+Both LLM stages have been exercised with a real provider on owned fixtures. See the
+[live verification record](docs/live-agent-verification.md) for results, the abstention
+failure found and corrected during testing, and the provider-credit limit encountered
+in the follow-up evaluation.
+
 Copy `.env.example` to `.env` to configure integrations. Empty optional values use
 their documented defaults. Secrets remain server-side and `.env` is Git-ignored.
 

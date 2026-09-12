@@ -50,6 +50,10 @@ temperature zero, bounded output tokens, and an optional PNG. It requires a prov
 that supports chat-completion JSON responses. Credentials remain server-side.
 Non-200 responses and invalid model outputs fail the investigation explicitly.
 
+For a tested text-model configuration and an opt-in check of both agent stages plus
+browser execution, see [live agent verification](live-agent-verification.md). HTTP 402
+requires resolving provider billing or credit before another live call can succeed.
+
 Set input/output prices per million tokens to estimate model cost. Cost stays unknown
 when pricing is missing and excludes hosting, retrieval, and browser execution.
 The provider reports token counts. Durable events and report usage provide local
