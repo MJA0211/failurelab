@@ -1,5 +1,51 @@
 # Portfolio walkthrough
 
+## Project entry
+
+**FailureLab — CI investigation workspace**
+
+[Source and setup](https://github.com/MJA0211/failurelab)
+
+FailureLab investigates CI failures by retrieving evidence, proposing causes, and
+running controlled browser experiments. I built the FastAPI/React application,
+checkpointed LangGraph workflow, GitHub ingestion, model adapter, and evaluation
+harness. The working local lab reproduces three failure mechanisms in Chromium and
+retains the baseline/intervention traces behind each finding. Missing evidence produces
+an inconclusive result. Live inference is configurable; the verified default uses
+explicit deterministic signatures on owned fixtures.
+
+## Resume-ready bullets
+
+- Built a CI investigation workspace with FastAPI, React/TypeScript, and checkpointed
+  LangGraph workflows; combined evidence retrieval, schema-validated model responses,
+  human review, and deterministic experimental verdicts.
+- Implemented interleaved Chromium baseline/intervention runs for three owned failure
+  mechanisms, with fresh browser contexts, blocked network access, retained traces,
+  and tests for incorrect interventions and missing evidence.
+- Built automated API, recovery, security-boundary, and browser acceptance tests;
+  configured Python 3.11/3.12 CI, production frontend builds, dependency audits,
+  CodeQL analysis, Dependabot updates, and dependency review.
+
+The bullets describe implemented engineering work. The model adapter and optional
+neural retrieval are integration capabilities; they are not evidence of measured
+model accuracy. Link the latest passing [quality run](https://github.com/MJA0211/failurelab/actions/workflows/ci.yml)
+when including a test count.
+
+## Evidence behind the claims
+
+| Claim | Evidence | Scope |
+|---|---|---|
+| Browser verification executes real actions | `tests/test_workflow.py`, `tests/test_ui.py`, retained traces | Owned synthetic fixtures; three reproduced mechanisms |
+| Workflows recover without repeating completed stages | Checkpoint replay and injected-failure tests | Tested local store/checkpointer configuration |
+| The baseline recognizes the authored signatures | 16-case versioned regression set and executable evaluation gate | Authored alongside the baseline; not held-out accuracy |
+| Local API reads were measured | [Initial verification report](verification.md): 120/120 successful reads, p95 83.96 ms at eight client threads | Historical local smoke measurement; excludes inference and runners |
+| Deployment adapters exist | [Deployment guide](deployment.md) and contract tests | Live provider, PostgreSQL, Docker, and remote runner acceptance remain unverified |
+
+There is no measured production diagnostic accuracy, production capacity, or developer
+time-saving result. Establishing those claims requires, respectively, a frozen external
+incident benchmark, workload-specific deployment measurements, and a controlled user
+study. A passing test suite or an authored regression score does not supply that evidence.
+
 ## Five-minute demonstration
 
 1. Open the dashboard. Show that owned synthetic data and baseline mode are labeled.

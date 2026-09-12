@@ -99,7 +99,7 @@ function ArtifactImage({ caseId, name }: { caseId: string; name: string }) {
   useEffect(() => {
     let live = true;
     let object = "";
-    request(`/artifacts/${caseId}/${name}`)
+    request(`/artifacts/${encodeURIComponent(caseId)}/${name}`)
       .then((r) => r.blob())
       .then((blob) => {
         object = URL.createObjectURL(blob);
@@ -689,7 +689,7 @@ function CaseDetail({
   async function exportReport(format: string) {
     try {
       await download(
-        `/investigations/${item.id}/report?format=${format}`,
+        `/investigations/${encodeURIComponent(item.id)}/report?format=${format}`,
         `${item.id}.${format === "markdown" ? "md" : "json"}`,
       );
     } catch (e) {
@@ -748,9 +748,12 @@ function CaseDetail({
               className="button secondary"
               onClick={async () => {
                 try {
-                  await api(`/investigations/${item.id}/retry`, {
-                    method: "POST",
-                  });
+                  await api(
+                    `/investigations/${encodeURIComponent(item.id)}/retry`,
+                    {
+                      method: "POST",
+                    },
+                  );
                   refresh();
                 } catch (e) {
                   onError((e as Error).message);
@@ -786,7 +789,7 @@ function CaseDetail({
               onClick={async () => {
                 try {
                   const next = await api<{ id: string }>(
-                    `/investigations/${item.id}/rerun`,
+                    `/investigations/${encodeURIComponent(item.id)}/rerun`,
                     { method: "POST" },
                   );
                   location.assign(`?case=${next.id}`);
@@ -1075,9 +1078,10 @@ function CaseDetail({
                           className="text-button"
                           key={a}
                           onClick={() =>
-                            download(`/artifacts/${item.id}/${a}`, a).catch(
-                              (err) => onError(err.message),
-                            )
+                            download(
+                              `/artifacts/${encodeURIComponent(item.id)}/${a}`,
+                              a,
+                            ).catch((err) => onError(err.message))
                           }
                         >
                           <ArrowDownToLine size={13} />
@@ -1198,7 +1202,7 @@ function EvidenceDetail({
           className="button secondary"
           onClick={() =>
             download(
-              `/artifacts/${caseId}/${item.artifact}`,
+              `/artifacts/${encodeURIComponent(caseId)}/${item.artifact}`,
               item.artifact!,
             ).catch((e) => onError(e.message))
           }
@@ -1228,7 +1232,7 @@ function ReviewDialog({
     e.preventDefault();
     setBusy(true);
     try {
-      await api(`/investigations/${item.id}/reviews`, {
+      await api(`/investigations/${encodeURIComponent(item.id)}/reviews`, {
         method: "POST",
         body: JSON.stringify({ decision, note }),
       });
@@ -1684,9 +1688,10 @@ export default function App() {
   const [page, setPage] = useState("investigations");
   const [cases, setCases] = useState<Case[]>([]);
   const [config, setConfig] = useState<Config>();
-  const [caseId, setCaseId] = useState<string | null>(
-    new URLSearchParams(location.search).get("case"),
-  );
+  const [caseId, setCaseId] = useState<string | null>(() => {
+    const candidate = new URLSearchParams(location.search).get("case");
+    return candidate && /^inv-[a-f0-9]{12}$/.test(candidate) ? candidate : null;
+  });
   const [item, setItem] = useState<Case>();
   const [search, setSearch] = useState("");
   const [creating, setCreating] = useState(false);
@@ -1730,11 +1735,14 @@ export default function App() {
       setItem(undefined);
       return;
     }
+    const selectedCaseId = caseId;
     let live = true;
     let timer: ReturnType<typeof setTimeout>;
     async function poll() {
       try {
-        const c = await api<Case>(`/investigations/${caseId}`);
+        const c = await api<Case>(
+          `/investigations/${encodeURIComponent(selectedCaseId)}`,
+        );
         if (live) setItem(c);
       } catch (e) {
         if (live) setError((e as Error).message);
@@ -1763,7 +1771,8 @@ export default function App() {
   }
   async function refreshDetail() {
     await refresh();
-    if (caseId) setItem(await api<Case>(`/investigations/${caseId}`));
+    if (caseId)
+      setItem(await api<Case>(`/investigations/${encodeURIComponent(caseId)}`));
   }
   const navigation = [
     { key: "investigations", label: "Investigations", icon: Layers3 },

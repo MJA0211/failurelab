@@ -19,6 +19,12 @@ expansion, model output, and experiment bounds prevent common accidental overloa
 Use ingress rate limits for an internet-facing deployment; app authentication alone
 is not a distributed abuse-prevention service.
 
+Credentialed GitHub API requests use a fixed HTTPS origin and canonical, bounded path
+segments. Dot segments, encoded delimiters, alternative origins, and unsupported query
+strings are rejected before the request is sent. Repository names have bounded owner
+and repository components. Browser deep links accept only generated investigation IDs;
+IDs are encoded separately when constructing API paths.
+
 GitHub metadata and artifact responses are read incrementally and stopped when the
 decoded response exceeds the configured ingestion limit. The response stream is
 closed on rejection. Bearer tokens and webhook signatures use constant-time byte
@@ -41,6 +47,11 @@ network routes are blocked. This is not a secure sandbox for arbitrary untrusted
 Imported code requires the separately isolated disposable-VM runner described in
 docs/runner-protocol.md. Review manifests cannot constrain malicious repository code;
 the VM boundary and credential/network restrictions remain mandatory.
+
+The repository runner binds a test name to one `--grep=` argument and escapes its
+regular-expression syntax. A name beginning with `--` cannot select a different CLI
+option. This argument boundary does not make repository execution safe outside the
+required disposable VM.
 
 Do not report credentials or private logs in public issues. Security fixes should
 include regression tests demonstrating the actual boundary that failed.

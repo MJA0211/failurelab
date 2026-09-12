@@ -1,5 +1,21 @@
 # Implementation verification
 
+## Portfolio update: September 12, 2026
+
+The boundary-hardening update passed **115 local tests** in 74.49 seconds on Windows
+with Python 3.11.5. This includes 22 new cases covering canonical GitHub paths,
+bounded repository names, CLI option injection, and browser deep-link manipulation.
+The frontend production build, Ruff lint/format, Prettier, pip-audit, and npm audit
+passed; neither dependency audit reported known vulnerabilities in its checked scope.
+The authored baseline evaluation again matched all 16 cases in each configuration.
+
+These are system verification results. Live model quality, production capacity, and
+developer time savings remain unmeasured. Hosted results are available in the
+[quality workflow history](https://github.com/MJA0211/failurelab/actions/workflows/ci.yml).
+CodeQL alerts require separate review from the scan's completion status.
+
+## Historical implementation measurements
+
 For the security patch's checks, see [v0.1.1 verification](releases/v0.1.1.md).
 The measurements below record the initial implementation.
 

@@ -5,18 +5,23 @@ and runs controlled browser experiments before supporting a finding.
 
 ![FailureLab investigation workspace](docs/screenshots/dashboard.png)
 
+[Five-minute walkthrough and portfolio evidence](docs/portfolio.md) ·
+[Latest quality checks](https://github.com/MJA0211/failurelab/actions/workflows/ci.yml)
+
 ## Run it
 
 Requirements: Python 3.11+, Node.js 22+, [uv](https://docs.astral.sh/uv/).
 No API key is needed for the owned browser lab.
 
 ```powershell
-cd G:\Desktop\failurelab
+git clone https://github.com/MJA0211/failurelab.git
+cd failurelab
 .\scripts\start.ps1
 ```
 
-Linux/macOS: `bash scripts/start.sh` (the Chromium OS dependency installer may
-request administrator access on Linux). Open **http://127.0.0.1:8787**.
+Linux/macOS: clone the repository, enter `failurelab`, then run `bash scripts/start.sh`.
+The Chromium OS dependency installer may request administrator access on Linux.
+Open **http://127.0.0.1:8787**.
 
 Manual setup:
 

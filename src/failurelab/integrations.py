@@ -18,6 +18,29 @@ class IntegrationError(RuntimeError):
     pass
 
 
+def github_api_url(path):
+    """Only canonical API paths may receive the GitHub credential."""
+    if not isinstance(path, str) or len(path) > 2048:
+        raise IntegrationError("Invalid GitHub API path")
+    pathname, separator, query = path.partition("?")
+    segments = pathname.split("/")
+    if (
+        segments[0] != ""
+        or len(segments) < 2
+        or any(
+            segment in {".", ".."} or not re.fullmatch(r"[A-Za-z0-9_.-]{1,200}", segment)
+            for segment in segments[1:]
+        )
+        or (separator and query != "per_page=100")
+    ):
+        raise IntegrationError("Invalid GitHub API path")
+    return (
+        "https://api.github.com/"
+        + "/".join(quote(segment, safe="") for segment in segments[1:])
+        + ("?per_page=100" if separator else "")
+    )
+
+
 class GitHub:
     def __init__(self, settings, transport=None):
         self.settings = settings
@@ -41,15 +64,21 @@ class GitHub:
         self.client.close()
 
     def allowed(self, repository):
+        parts = repository.split("/") if isinstance(repository, str) else []
         if (
-            not re.fullmatch(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", repository)
+            len(parts) != 2
+            or any(
+                part in {".", ".."} or not re.fullmatch(r"[A-Za-z0-9_.-]{1,100}", part)
+                for part in parts
+            )
             or repository.lower() not in self.settings.allowed_repositories
         ):
             raise IntegrationError("Repository is not in FAILURELAB_GITHUB_REPOSITORIES")
 
     def get(self, path):
+        url = github_api_url(path)
         for attempt in range(3):
-            with self.client.stream("GET", path) as response:
+            with self.client.stream("GET", url) as response:
                 if response.status_code == 200:
                     return json.loads(self.read_bounded(response))
                 if response.status_code not in {429, 502, 503, 504} or attempt == 2:
@@ -69,7 +98,7 @@ class GitHub:
         return b"".join(chunks)
 
     def download(self, path):
-        with self.client.stream("GET", path) as response:
+        with self.client.stream("GET", github_api_url(path)) as response:
             if response.status_code == 200:
                 return self.read_bounded(response)
             if response.status_code not in {301, 302, 303, 307, 308}:

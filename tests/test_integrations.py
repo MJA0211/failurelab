@@ -9,6 +9,41 @@ from failurelab.integrations import GitHub, IntegrationError, npm_metadata, read
 
 
 @pytest.mark.parametrize("operation", ["get", "download"])
+@pytest.mark.parametrize(
+    "path",
+    [
+        "https://attacker.example/secrets",
+        "//attacker.example/secrets",
+        "/repos/owner/../private",
+        "/repos/owner/%2e%2e/private",
+        "/repos/owner\\private",
+        "/repos/owner/repo#fragment",
+        "/repos/owner/repo?redirect=https://attacker.example",
+    ],
+)
+def test_github_rejects_noncanonical_paths_before_sending_credentials(settings, operation, path):
+    def forbidden(request):
+        pytest.fail("Invalid API paths must be rejected before any HTTP request")
+
+    github = GitHub(settings, httpx.MockTransport(forbidden))
+    try:
+        with pytest.raises(IntegrationError, match="API path"):
+            getattr(github, operation)(path)
+    finally:
+        github.close()
+
+
+@pytest.mark.parametrize("repository", ["owner/..", "./repo", "a" * 101 + "/repo", "a/b/c"])
+def test_even_allowlisted_repositories_require_bounded_canonical_names(settings, repository):
+    github = GitHub(settings.model_copy(update={"github_repositories": repository}))
+    try:
+        with pytest.raises(IntegrationError, match="not in"):
+            github.allowed(repository)
+    finally:
+        github.close()
+
+
+@pytest.mark.parametrize("operation", ["get", "download"])
 def test_github_stops_reading_at_limit_and_closes_stream(settings, operation):
     class OversizedStream(httpx.SyncByteStream):
         closed = False

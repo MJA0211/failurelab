@@ -126,6 +126,7 @@ def execute(request: RunnerRequest, manifest_digest: str):
                 "fetch",
                 "--depth=1",
                 f"https://github.com/{request.repository}.git",
+                # SHA validation prevents Git options or refspec injection.
                 request.commit_sha,
             ],
             ["git", "checkout", "--detach", "FETCH_HEAD"],
@@ -162,8 +163,7 @@ def execute(request: RunnerRequest, manifest_digest: str):
                         "node",
                         str(cli),
                         "test",
-                        "--grep",
-                        re.escape(request.test_name),
+                        "--grep=" + re.escape(request.test_name),
                         "--retries=0",
                         "--workers=1",
                         "--reporter=json",

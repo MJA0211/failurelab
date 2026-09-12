@@ -1,9 +1,51 @@
 import json
+import re
 
 import pytest
 from pydantic import ValidationError
 
 from failurelab.runner_service import RunnerRequest, parse_test_result, validate_manifest
+
+
+@pytest.mark.parametrize("test_name", ["--config=/tmp/evil.js", "--help", "checkout [v2].*"])
+def test_runner_test_names_cannot_become_command_options(monkeypatch, test_name):
+    import hashlib
+
+    from failurelab import runner_service
+
+    manifest = b'{"version":1,"interventions":{"remove_overlay":{"env":{}}}}'
+    observed = []
+
+    def fake_command(args, cwd, env, timeout):
+        if args[:2] == ["git", "init"]:
+            (cwd / ".failurelab").mkdir()
+            (cwd / ".failurelab/runner.json").write_bytes(manifest)
+            (cwd / "package-lock.json").write_text("{}")
+            cli = cwd / "node_modules/@playwright/test/cli.js"
+            cli.parent.mkdir(parents=True)
+            cli.write_text("// owned contract fixture")
+        if args[:2] == ["git", "rev-parse"]:
+            return 0, "a" * 40
+        if args[0] == "node":
+            observed.append(args)
+            # Parse the option boundary instead of accepting an unbound second argument.
+            grep_values = [arg.partition("=")[2] for arg in args if arg.startswith("--grep=")]
+            assert len(grep_values) == 1
+            assert re.fullmatch(grep_values[0], test_name)
+            assert test_name not in args
+            assert not any(arg.startswith("--config=") or arg == "--help" for arg in args)
+            return 0, report()
+        return 0, ""
+
+    monkeypatch.setattr(runner_service, "command", fake_command)
+    request = RunnerRequest(
+        repository="owner/repo",
+        commit_sha="a" * 40,
+        test_name=test_name,
+        plan={"hypothesis_id": "h1", "intervention": "remove_overlay", "rationale": "test"},
+    )
+    runner_service.execute(request, hashlib.sha256(manifest).hexdigest())
+    assert len(observed) == request.plan.repetitions * 2
 
 
 def report(status="passed", expected="passed", results=None):

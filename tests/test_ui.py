@@ -6,6 +6,7 @@ import subprocess
 import sys
 import time
 from pathlib import Path
+from urllib.parse import quote
 
 import httpx
 import pytest
@@ -114,6 +115,25 @@ def test_dashboard_evidence_experiments_review_export(live_server):
         ).to_be_visible()
         assert errors == []
         browser.close()
+
+
+@pytest.mark.browser
+def test_untrusted_deep_link_cannot_choose_an_api_path(live_server):
+    with sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        try:
+            page = browser.new_page()
+            requests = []
+            page.on("request", lambda request: requests.append(request.url))
+            for value in ("../../config", "inv-deadbeef0000/../../metrics", "//attacker.example"):
+                requests.clear()
+                page.goto(live_server + "/?case=" + quote(value, safe=""))
+                expect(page.locator(".case-row")).to_have_count(4)
+                api_paths = [url.removeprefix(live_server) for url in requests if "/api/" in url]
+                assert set(api_paths) <= {"/api/investigations", "/api/config"}, api_paths
+                assert all(url.startswith(live_server + "/") for url in requests), requests
+        finally:
+            browser.close()
 
 
 @pytest.mark.browser
