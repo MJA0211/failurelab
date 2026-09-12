@@ -74,6 +74,12 @@ class GitHub:
             or repository.lower() not in self.settings.allowed_repositories
         ):
             raise IntegrationError("Repository is not in FAILURELAB_GITHUB_REPOSITORIES")
+        # Use the operator's canonical entry, not request text, in subsequent API paths.
+        return next(
+            approved
+            for approved in self.settings.allowed_repositories
+            if approved == repository.lower()
+        )
 
     def get(self, path):
         url = github_api_url(path)
@@ -128,7 +134,10 @@ class GitHub:
                 return self.read_bounded(stream)
 
     def describe_run(self, repository, run_id):
-        self.allowed(repository)
+        repository = self.allowed(repository)
+        run_id = int(run_id)
+        if run_id <= 0:
+            raise IntegrationError("GitHub run ID must be positive")
         run = self.get(f"/repos/{repository}/actions/runs/{run_id}")
         payload = InvestigationInput(
             title=(run.get("display_title") or run.get("name") or "GitHub workflow failure")[:200],
@@ -158,7 +167,7 @@ class GitHub:
 
     def collect(self, case, store):
         repo, sha = case["repository"], case["commit_sha"]
-        self.allowed(repo)
+        repo = self.allowed(repo)
         run_id = case["payload"]["run_id"]
         attempt = case["payload"].get("run_attempt", 1)
         prefix = f"/repos/{repo}"

@@ -105,6 +105,14 @@ def validate_manifest(path, intervention):
 
 
 def execute(request: RunnerRequest, manifest_digest: str):
+    # Validate again at the execution boundary, including direct/internal callers.
+    repository, commit_sha = request.repository, request.commit_sha
+    if not re.fullmatch(r"[A-Za-z0-9_.-]{1,100}/[A-Za-z0-9_.-]{1,100}", repository):
+        raise ValueError("Invalid repository name")
+    if any(part in {".", ".."} for part in repository.split("/")):
+        raise ValueError("Invalid repository name")
+    if not re.fullmatch(r"[a-fA-F0-9]{40}", commit_sha):
+        raise ValueError("A full commit SHA is required")
     start = time.perf_counter()
     # Credentials and service configuration never enter child environments.
     env = {
@@ -125,9 +133,8 @@ def execute(request: RunnerRequest, manifest_digest: str):
                 "protocol.file.allow=never",
                 "fetch",
                 "--depth=1",
-                f"https://github.com/{request.repository}.git",
-                # SHA validation prevents Git options or refspec injection.
-                request.commit_sha,
+                f"https://github.com/{repository}.git",
+                commit_sha,
             ],
             ["git", "checkout", "--detach", "FETCH_HEAD"],
         ):

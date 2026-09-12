@@ -48,6 +48,30 @@ def test_runner_test_names_cannot_become_command_options(monkeypatch, test_name)
     assert len(observed) == request.plan.repetitions * 2
 
 
+@pytest.mark.parametrize(
+    "field,value",
+    [
+        ("repository", "owner/repo;id"),
+        ("repository", "owner/.."),
+        ("repository", "owner/repo\n--upload-pack=evil"),
+        ("commit_sha", "--upload-pack=evil"),
+        ("commit_sha", "a" * 40 + ":refs/heads/master"),
+    ],
+)
+def test_execution_boundary_rejects_invalid_git_arguments_even_without_model_validation(
+    monkeypatch, field, value
+):
+    from failurelab import runner_service
+
+    request = RunnerRequest.model_construct(repository="owner/repo", commit_sha="a" * 40)
+    setattr(request, field, value)
+    monkeypatch.setattr(
+        runner_service, "command", lambda *args: pytest.fail("Invalid checkout must not execute")
+    )
+    with pytest.raises(ValueError):
+        runner_service.execute(request, "b" * 64)
+
+
 def report(status="passed", expected="passed", results=None):
     return json.dumps(
         {

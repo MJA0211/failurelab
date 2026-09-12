@@ -2,9 +2,10 @@
 
 ## Portfolio update: September 12, 2026
 
-The boundary-hardening update passed **115 local tests** in 74.49 seconds on Windows
-with Python 3.11.5. This includes 22 new cases covering canonical GitHub paths,
-bounded repository names, CLI option injection, and browser deep-link manipulation.
+The boundary-hardening update passed **120 local tests** in 74.95 seconds on Windows
+with Python 3.11.5. This includes 27 new cases covering canonical GitHub paths,
+bounded repository names, CLI option injection, browser deep-link manipulation, and
+execution-boundary checks when callers bypass request-model validation.
 The frontend production build, Ruff lint/format, Prettier, pip-audit, and npm audit
 passed; neither dependency audit reported known vulnerabilities in its checked scope.
 The authored baseline evaluation again matched all 16 cases in each configuration.

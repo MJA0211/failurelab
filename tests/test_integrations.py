@@ -83,7 +83,8 @@ def test_github_allowlist_and_exact_commit(settings):
         )
 
     client = GitHub(settings, httpx.MockTransport(handler))
-    result = client.describe_run("owner/repo", 12)
+    result = client.describe_run("OWNER/Repo", 12)
+    assert result["repository"] == "owner/repo"
     assert result["commit_sha"] == "b" * 40
     assert result["run_attempt"] == 2
     assert requests == ["https://api.github.com/repos/owner/repo/actions/runs/12"]
