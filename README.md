@@ -5,7 +5,8 @@ and runs controlled browser experiments before supporting a finding.
 
 ![FailureLab investigation workspace](docs/screenshots/dashboard.png)
 
-[Five-minute walkthrough and portfolio evidence](docs/portfolio.md) ·
+[Watch the recorded demo](docs/walkthrough.webm) ·
+[Portfolio evidence and walkthrough](docs/portfolio.md) ·
 [Latest quality checks](https://github.com/MJA0211/failurelab/actions/workflows/ci.yml)
 
 ## Run it

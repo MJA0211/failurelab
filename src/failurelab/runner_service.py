@@ -133,6 +133,7 @@ def execute(request: RunnerRequest, manifest_digest: str):
                 "protocol.file.allow=never",
                 "fetch",
                 "--depth=1",
+                "--",
                 f"https://github.com/{repository}.git",
                 commit_sha,
             ],

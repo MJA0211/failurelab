@@ -1,5 +1,7 @@
 # Security boundaries
 
+[Reported findings and boundary review](docs/security-review.md)
+
 FailureLab has one workspace trust domain. A configured bearer token protects all
 workspace API access, including downloads. It is not per-user authentication or
 multi-tenancy. Binding outside loopback requires a token. A same-origin deployment

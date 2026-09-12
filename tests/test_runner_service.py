@@ -72,6 +72,41 @@ def test_execution_boundary_rejects_invalid_git_arguments_even_without_model_val
         runner_service.execute(request, "b" * 64)
 
 
+def test_git_option_terminator_treats_option_shaped_repository_as_data(tmp_path):
+    import os
+    import subprocess
+
+    env = {
+        **os.environ,
+        "GIT_CONFIG_NOSYSTEM": "1",
+        "GIT_CONFIG_GLOBAL": os.devnull,
+        "GIT_TERMINAL_PROMPT": "0",
+        "LC_ALL": "C",
+    }
+    subprocess.run(
+        ["git", "init", "--quiet"],
+        cwd=tmp_path,
+        env=env,
+        check=True,
+        capture_output=True,
+        timeout=10,
+    )
+    result = subprocess.run(
+        ["git", "-c", "protocol.file.allow=never", "fetch", "--depth=1", "--", "--help", "a" * 40],
+        cwd=tmp_path,
+        env=env,
+        capture_output=True,
+        text=True,
+        timeout=10,
+    )
+    # Git rejects a repository pathname (before or at transport selection), not an option.
+    assert result.returncode == 128
+    assert (
+        "strange pathname '--help' blocked" in result.stderr
+        or "transport 'file' not allowed" in result.stderr
+    ), result.stderr
+
+
 def report(status="passed", expected="passed", results=None):
     return json.dumps(
         {

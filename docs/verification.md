@@ -2,10 +2,11 @@
 
 ## Portfolio update: September 12, 2026
 
-The boundary-hardening update passed **120 local tests** in 74.95 seconds on Windows
-with Python 3.11.5. This includes 27 new cases covering canonical GitHub paths,
+The boundary-hardening update passed **121 local tests** in 74.82 seconds on Windows
+with Python 3.11.5. This includes 28 new cases covering canonical GitHub paths,
 bounded repository names, CLI option injection, browser deep-link manipulation, and
-execution-boundary checks when callers bypass request-model validation.
+execution-boundary checks when callers bypass request-model validation. The suite also
+checks Git's actual parsing of an option-shaped repository operand after `--`.
 The frontend production build, Ruff lint/format, Prettier, pip-audit, and npm audit
 passed; neither dependency audit reported known vulnerabilities in its checked scope.
 The authored baseline evaluation again matched all 16 cases in each configuration.
@@ -14,6 +15,12 @@ These are system verification results. Live model quality, production capacity, 
 developer time savings remain unmeasured. Hosted results are available in the
 [quality workflow history](https://github.com/MJA0211/failurelab/actions/workflows/ci.yml).
 CodeQL alerts require separate review from the scan's completion status.
+The [finding review](security-review.md) records the fixes and command-boundary analysis.
+
+The [recorded walkthrough](walkthrough.webm) was generated from a fresh owned-fixture
+workspace with baseline mode, then visually reviewed. It is 27.56 seconds, 1440 × 1000,
+and contains no audio. The recording script completed its UI assertions without page
+errors and removed its temporary server/database workspace.
 
 ## Historical implementation measurements
 

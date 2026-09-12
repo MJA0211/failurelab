@@ -48,6 +48,22 @@ study. A passing test suite or an authored regression score does not supply that
 
 ## Five-minute demonstration
 
+[Watch the recorded walkthrough](walkthrough.webm). This silent recording shows a
+fresh local workspace with owned fixtures and deterministic baseline mode. Captions
+describe the evidence, browser comparison, human review, and abstention steps. It does
+not show live model inference or an imported production incident.
+
+To regenerate it after building the frontend:
+
+```sh
+uv run python scripts/record_walkthrough.py
+```
+
+The recorder starts its own server on a random loopback port, ignores `.env` and
+inherited application settings, seeds a temporary database, and blocks nonlocal browser
+requests. It replaces `docs/walkthrough.webm` with the recording and removes its temporary
+workspace. Review the recording before publishing it.
+
 1. Open the dashboard. Show that owned synthetic data and baseline mode are labeled.
 2. Open the overlay failure. Inspect the actual pre-intervention browser screenshot.
 3. Click a citation and show the exact retained log, source location, and content hash.
