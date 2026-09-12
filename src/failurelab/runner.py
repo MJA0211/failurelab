@@ -1,12 +1,13 @@
 """Only owned fixture HTML executes locally. Repository code requires a remote runner."""
 
+import base64
 import hashlib
 import platform
 import time
 
 import httpx
 
-from failurelab.schemas import ExperimentPlan, ExperimentResult
+from failurelab.schemas import ExperimentPlan, ExperimentResult, RunnerResponse
 
 RUNNER_VERSION = "fixture-runner-v2"
 # Both experimental conditions use the same bounded actionability budget.
@@ -171,7 +172,8 @@ def run_experiment(settings, store, case, plan):
         return run_fixture(store, case["id"], case["scenario"], plan)
     if settings.runner_url:
         with httpx.Client(timeout=600, follow_redirects=False) as client:
-            response = client.post(
+            with client.stream(
+                "POST",
                 settings.runner_url.rstrip("/") + "/experiments",
                 headers={
                     "Authorization": "Bearer " + settings.runner_token.get_secret_value(),
@@ -183,9 +185,16 @@ def run_experiment(settings, store, case, plan):
                     "test_name": case["test_name"],
                     "plan": plan.model_dump(),
                 },
-            )
-        response.raise_for_status()
-        result = ExperimentResult.model_validate(response.json())
+            ) as response:
+                response.raise_for_status()
+                chunks, size = [], 0
+                for chunk in response.iter_bytes():
+                    size += len(chunk)
+                    if size > min(16_000_000, settings.max_artifact_bytes * 2):
+                        raise RuntimeError("Runner response exceeded the transfer limit")
+                    chunks.append(chunk)
+        remote = RunnerResponse.model_validate_json(b"".join(chunks))
+        result = ExperimentResult.model_validate(remote.model_dump(exclude={"artifact_payloads"}))
         if (
             result.hypothesis_id != plan.hypothesis_id
             or result.intervention != plan.intervention
@@ -200,6 +209,39 @@ def run_experiment(settings, store, case, plan):
             result.repetitions,
             result.intervention,
         )
+        if (
+            len(set(result.artifacts)) != len(result.artifacts)
+            or set(result.artifacts) != {a.name for a in remote.artifact_payloads}
+            or len(remote.artifact_payloads) != len(result.artifacts)
+        ):
+            raise RuntimeError("Runner artifact declarations do not match the payloads")
+        retained, total = [], 0
+        for artifact in remote.artifact_payloads:
+            try:
+                data = base64.b64decode(artifact.data_base64, validate=True)
+            except ValueError as exc:
+                raise RuntimeError("Runner artifact has invalid base64") from exc
+            total += len(data)
+            if total > settings.max_artifact_bytes:
+                raise RuntimeError("Runner artifacts exceeded the retention limit")
+            extension = artifact.name.rsplit(".", 1)[-1]
+            magic = b"\x89PNG\r\n\x1a\n" if extension == "png" else b"PK\x03\x04"
+            if hashlib.sha256(data).hexdigest() != artifact.sha256 or not data.startswith(magic):
+                raise RuntimeError("Runner artifact content failed integrity validation")
+            name = f"runner-{artifact.sha256}.{extension}"
+            retained.append((name, data))
+        for name, data in retained:
+            path = store.artifact_path(case["id"], name)
+            if path.exists() and path.read_bytes() != data:
+                raise RuntimeError("Retained runner artifact differs from its content hash")
+            if not path.exists():
+                temporary = path.with_suffix(path.suffix + ".tmp")
+                temporary.write_bytes(data)
+                temporary.replace(path)
+        result.artifacts = [name for name, _ in retained]
+        result.environment["artifact_sha256"] = {
+            name: hashlib.sha256(data).hexdigest() for name, data in retained
+        }
         return result
     return ExperimentResult(
         hypothesis_id=plan.hypothesis_id,

@@ -59,6 +59,16 @@ class ExperimentResult(StrictModel):
     environment: dict = Field(default_factory=dict)
 
 
+class RunnerArtifact(StrictModel):
+    name: str = Field(pattern=r"^[A-Za-z0-9_-]{1,100}\.(?:png|zip)$")
+    sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+    data_base64: str = Field(max_length=8_000_000)
+
+
+class RunnerResponse(ExperimentResult):
+    artifact_payloads: list[RunnerArtifact] = Field(default_factory=list, max_length=16)
+
+
 class InvestigationInput(StrictModel):
     title: str = Field(min_length=3, max_length=200)
     repository: str = Field(pattern=r"^[a-zA-Z0-9_.-]+/[a-zA-Z0-9_.-]+$")
