@@ -1,5 +1,54 @@
 # Architecture
 
+## Investigation and control boundaries
+
+FailureLab separates model proposals from permission to execute and from the
+experimental verdict. The two agents are stages in one LangGraph workflow. They
+receive bounded evidence and return typed data; they cannot execute a shell or
+approve a release.
+
+```mermaid
+flowchart TD
+  I[GitHub incident / owned fixture / manual evidence] --> A[Authenticated ingestion and evidence acquisition]
+  A --> E[Retained evidence IDs and hashes]
+  E --> R[Retrieval within this investigation]
+  subgraph Reasoning[Model reasoning in chat mode]
+    D[Diagnosis proposal]
+    P[Intervention plan]
+    D --> P
+  end
+  R --> D
+  P --> V[Schema, citation, hypothesis, and budget checks]
+  V --> X[Bounded runner: baseline and intervention]
+  X --> T[Deterministic validation of counts and assertion identity]
+  T --> O[Verdict and report]
+  X --> F[Retained screenshots and traces with hashes]
+  F --> O
+  O --> H[Human review]
+  C[(Persistent checkpoints)] --- A
+  C --- R
+  C --- D
+  C --- P
+  C --- X
+  C --- O
+  C --> Q[Replay validates identity, runtime, and completed report]
+  Q --> U[Reuse valid completed result]
+```
+
+| Boundary | Enforced by the application | Evidence or limitation |
+|---|---|---|
+| Evidence | Snapshot, bounded collection, retrieved citation IDs | Source and artifact hashes identify retained content |
+| Model reasoning | Structured diagnosis/plan contracts; unknown cannot authorize experiments | Chat uses a provider; baseline uses explicit signatures |
+| Actions | Allowlisted interventions and counts; external runner authentication and reviewed manifest | Imported code requires a disposable Linux VM |
+| Validation | Same assertion identity; verdict recomputed from recorded counts | Support applies to the tested mechanism and environment |
+| Persistence | Leases, checkpoints, idempotent results and events | Completed replay returns the stored report; invalid state stops execution |
+| Release | Separate tests, live acceptance, deployment checks, and human review | A supported case does not satisfy the release gate by itself |
+
+The local runner accepts only application-owned fixtures. The external runner
+executes a pinned repository through an operator-reviewed harness; the model chooses
+an action name, while that harness defines its effect. See the
+[runner protocol](runner-protocol.md) for the VM boundary and manifest contract.
+
 ## Workflow
 
 An ingestion request creates an investigation and snapshots its evidence. The
@@ -64,6 +113,49 @@ storage. Hashes identify the retained redacted snapshot, not the upstream unreda
 The UI uses the same-origin API, polls live cases, and maintains a case ID in the URL.
 It renders content as text, fetches authenticated image blobs, and exports versioned
 reports. Reviews append an opinion without rewriting evidence or experimental outcomes.
+
+## Failure classification and replay
+
+HTTP/transport failures raise `ProviderUnavailable` and record a sanitized
+`provider_error` event. HTTP 402 therefore remains `provider_unavailable`, with no
+accepted diagnosis, fallback, or abstention credit for the failed stage. Invalid
+provider output raises `AgentOutputError`. A schema-valid but wrong diagnosis is
+assessed separately by the acceptance scorer; it is not an HTTP failure.
+
+| Observation | Recorded handling |
+|---|---|
+| Provider HTTP/transport error | Worker category `provider_unavailable`; status and duration retained without response bodies or private headers |
+| Invalid schema, citation, or plan | Worker category `agent_failed`; execution is not authorized |
+| Completed investigation fails expected live acceptance | Harness classification `agent_failed`; original report preserved |
+| Other worker/application/infrastructure exception | Worker category `execution_failed`; harness uses `test_harness_failed` for an unclassified failed case |
+| Unavailable external execution | Experiment `unavailable`; finding stays `inconclusive` |
+| Real browser failure or ineffective intervention | Counts feed the deterministic verdict; no provider-error classification |
+
+These categories do not independently diagnose every infrastructure fault. The
+timeline, exception type, runner observations, and acceptance checks supply the
+context needed to investigate an application or harness failure.
+
+Calls are reserved before dispatch and counted from persistent events, including
+failed requests. A pending checkpoint must match the recorded inference/retrieval
+configuration and tool-schema hash. Completed replay requires matching investigation
+identity and report data; a missing or corrupted checkpoint fails safely. A valid
+completed checkpoint returns without updating the case timestamp or running stages.
+The [release tests](../tests/test_release_gate.py) exercise these boundaries.
+
+## Provenance and release evidence
+
+Runtime checkpoints record the provider endpoint, configured model, prompt version,
+retrieval configuration, and tool version/hash. Model events retain attempted calls,
+provider-reported usage, returned model identifier, and error timing. Reports connect
+evidence IDs to experiments and retained artifacts; the acceptance harness also
+freezes input snapshots and implementation hashes before inference. These fields
+span the checkpoint, event log, report, and acceptance record rather than one export.
+
+Missing prices leave estimated cost unavailable. A model identifier is not an exposed
+weights revision. Hashes identify bytes; they do not establish that a model's explanation
+is correct. The [release evidence](validation/release-gate-results.json) preserves
+partial runs alongside complete cases. Release readiness is assessed separately in
+the [gate report](releases/v0.1.2-gate.md).
 
 ## Deliberate operational scope
 

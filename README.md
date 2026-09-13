@@ -1,7 +1,41 @@
 # FailureLab
 
-FailureLab is a CI investigation workspace. It retrieves evidence, proposes causes,
-and runs controlled browser experiments before supporting a finding.
+FailureLab investigates CI failures using two bounded agent stages: diagnosis and
+experiment planning. It retrieves logs, source, and browser evidence, then tests a
+proposed intervention against the failing baseline with the same assertions. The
+application computes the verdict from those runs, so a plausible explanation alone
+cannot become a supported finding.
+
+Reports retain evidence hashes, model/tool versions, screenshots, traces, and
+checkpoints. Completed cases can be replayed without repeating inference or execution.
+Authenticated ingestion, reviewed runner manifests, and action budgets constrain
+what an investigation can read and execute.
+
+## Validation status
+
+**v0.1.2 — BLOCKED**
+
+Deterministic validation passes, the unfamiliar authored incident is verified, and
+the required GitHub checks pass. The current four-fixture live provider gate remains
+incomplete after HTTP 402/payment availability failures. No `v0.1.2` tag or GitHub
+release has been created. Deployment smoke testing and human review remain outstanding.
+
+| Evidence | Recorded result | Scope |
+|---|---|---|
+| Python and browser tests | 146 passed; 78% combined statement/branch coverage | Includes 10 browser and 16 release-gate tests |
+| Deterministic evaluation | 16/16 in both variants | Authored signature regression cases |
+| Unfamiliar invoice incident | Baseline 0/3; intervention 3/3; `supported` | Separate authored GitHub repository, live agents, Linux runner |
+| Completed-case replay | Three replays; zero new model calls or Actions jobs | Preserved case, evidence, and artifact hashes |
+| Static analysis and audits | Ruff/Mypy pass; zero CodeQL findings; zero npm/Python audit vulnerabilities | Checked code and installed dependencies |
+| Latest live gate | Six of seven calls succeeded; three fixtures passed | Unknown fixture blocked before diagnosis; gate incomplete |
+
+The [release report](docs/releases/v0.1.2-gate.md) links the evidence and exact checks.
+Read the [case study](docs/portfolio-case-study.md),
+[portfolio summary](docs/portfolio-summary.md), or
+[final readiness assessment](docs/releases/v0.1.2-final-readiness.md) for the engineering
+results and remaining release requirements. These results support a portfolio account
+of the implemented system; independent model accuracy and production benefits remain
+unmeasured.
 
 ![FailureLab investigation workspace](docs/screenshots/dashboard.png)
 
@@ -57,6 +91,19 @@ reviews, and results persist under `var/`.
 - A separately deployable Linux repository runner with reviewed manifest hashes.
 - Human reviews, JSON/Markdown export, model usage/version records, and an evaluation dashboard.
 - API, integration-contract, crash recovery, real-browser, and responsive UI tests.
+
+## What this demonstrates
+
+The unfamiliar incident connects evidence-driven diagnosis and intervention planning
+to a real GitHub Actions experiment. Deterministic validation keeps the model's
+proposal separate from the final verdict. Frozen evidence, version records, and
+checkpoint checks make both successful and failed investigations reviewable.
+
+Provider failures have their own classification, and failed calls consume the
+persistent budget. Regression tests exercise replay, security boundaries, and actual
+browser behavior. CI runs Python 3.11/3.12 checks, frontend validation, dependency
+audits, and CodeQL. The portfolio evidence covers these implemented controls and
+their measured development results.
 
 ## Modes are explicit
 
@@ -169,6 +216,18 @@ Human review records do not automatically merge code or send messages.
 Live provider inference, remote repository execution, PostgreSQL deployment, and
 Docker deployment require the corresponding credentials/infrastructure. The local
 verification report distinguishes tests executed here from these integration paths.
+
+## Limitations
+
+The fixtures and unfamiliar incident are authored development validation. There is
+no independent benchmark, measured production diagnostic accuracy, or measured
+developer time saving. Live inference depends on external provider availability;
+the current prompt's complete four-fixture acceptance remains blocked.
+
+Docker/PostgreSQL deployment smoke testing depends on infrastructure unavailable
+locally. Public webhook delivery and a permanent private runner endpoint remain
+unverified. Human review is pending. The existing Linux result covers one reviewed
+owned repository in a disposable VM; it does not certify arbitrary repository execution.
 
 ## Repository map
 
