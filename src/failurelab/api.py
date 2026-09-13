@@ -14,7 +14,7 @@ from failurelab import __version__
 from failurelab.config import Settings
 from failurelab.fixtures import fixture, seed
 from failurelab.integrations import GitHub, IntegrationError, npm_metadata
-from failurelab.schemas import DemoRequest, GitHubImport, InvestigationInput, Review
+from failurelab.schemas import DemoRequest, Evidence, GitHubImport, InvestigationInput, Review
 from failurelab.store import Store
 from failurelab.workflow import Worker
 
@@ -321,15 +321,15 @@ def create_app(settings: Settings | None = None):
                 commit_sha=run["head_sha"],
                 test_name=(run.get("name") or "GitHub Actions")[:300],
                 evidence=[
-                    {
-                        "id": "e-run",
-                        "title": "Workflow metadata",
-                        "kind": "metadata",
-                        "content": json.dumps(
+                    Evidence(
+                        id="e-run",
+                        title="Workflow metadata",
+                        kind="metadata",
+                        content=json.dumps(
                             {"run_id": run["id"], "attempt": run.get("run_attempt", 1)}
                         ),
-                        "source": run.get("html_url", ""),
-                    }
+                        source=run.get("html_url", ""),
+                    )
                 ],
             ).model_dump()
             payload.update(run_id=run["id"], run_attempt=run.get("run_attempt", 1))

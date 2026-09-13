@@ -66,6 +66,12 @@ permissions and team needs; exported reports must follow the same policy.
 
 ## Failure recovery
 
+Completed replay preserves the stored report and timestamp. A missing completed
+checkpoint, a different checkpoint report, or the wrong investigation identity
+stops replay. Restore a consistent backup before retrying corrupted state. Pending
+checkpoints also compare the tool-schema hash; changed contracts require a new
+investigation. See the [release check](releases/v0.1.2-gate.md) for exercised cases.
+
 - **Provider failure:** case becomes failed with a sanitized error. Fix configuration
   and use Retry from checkpoint. No baseline substitution occurs.
 - **Worker crash:** the lease expires, a worker reclaims the case, and LangGraph resumes.

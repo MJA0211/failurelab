@@ -1,5 +1,13 @@
 # Implementation verification
 
+## Release check: September 13, 2026
+
+The [v0.1.2 release check](releases/v0.1.2-gate.md) records 146 passing local tests
+with 78% combined statement/branch coverage, Mypy verification, and further replay
+checks. The live acceptance script now preserves inputs, source hashes, checkpoint
+state, and distinct failure categories. Two fresh live runs remained incomplete
+after provider HTTP 402 responses. Release status remains `BLOCKED`.
+
 ## Unfamiliar CI validation: September 12, 2026
 
 The [single-incident record](unfamiliar-ci-validation.md) documents actual GitHub

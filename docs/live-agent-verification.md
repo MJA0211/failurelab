@@ -1,5 +1,9 @@
 # Live agent verification
 
+The [September 13 release check](releases/v0.1.2-gate.md) records the current
+acceptance script, additional provenance, and two further incomplete provider runs.
+The earlier results below remain historical observations.
+
 On September 12, 2026, FailureLab completed four fresh owned-fixture investigations
 using `Qwen/Qwen3-235B-A22B-Instruct-2507:novita` through Hugging Face's chat router.
 Both diagnosis and experiment planning made real provider calls. Vision was disabled;

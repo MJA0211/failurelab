@@ -1,0 +1,1103 @@
+{
+  "scope": "Authored fixture release acceptance; no independent diagnostic accuracy claim",
+  "attempts": [
+    {
+      "started_at": "2026-09-13T07:11:06.471304+00:00",
+      "mode": "chat",
+      "model": "Qwen/Qwen3-235B-A22B-Instruct-2507:novita",
+      "provider": "https://router.huggingface.co/v1",
+      "prompt_version": "failurelab-agents-v3",
+      "tool_description_version": "reviewed-interventions-v1",
+      "tool_schema_sha256": "2f64287f9ce6fd7928ec519bedd825b884e36239c3548f4a0a0fcd5cefbefa93",
+      "vision": false,
+      "implementation_commit": "ca68583b5b2cca6cd9bf3b5432f3943938001c0e",
+      "implementation_dirty": true,
+      "implementation_sha256": {
+        "src/failurelab/fixtures.py": "159c8340058cbfe28b629d162ab56de2ea7e47ee940ad304ef559dc1d207a447",
+        "src/failurelab/runner.py": "09cee698328130600c68ae202d3e8c8420d8ed10bf1305efb24526751c9034a2",
+        "src/failurelab/agents.py": "892cf2cdd582b8ee399fc973cca22fd3d36acde7f449639d2693b44e17181aa9",
+        "src/failurelab/schemas.py": "0e04c68750eee79a1296a96f1ad1f8308141e03cbe8fe549d2a66e16076b5bf5",
+        "src/failurelab/workflow.py": "a5e76a0994ec2e4f1a6e8e978b486d5afec099fe1f9251ce182186ffa7bbfa71",
+        "scripts/verify_live_agents.py": "a729cb33b557bc651dfe652115543f3920acdb06ba2f7cf265beb73c094aa678"
+      },
+      "scope": "Four owned synthetic fixtures; live integration acceptance, not held-out accuracy.",
+      "cases": [
+        {
+          "scenario": "overlay",
+          "case_id": "inv-2765e9c3bf66",
+          "status": "passed",
+          "fixture_commit_label": "a13f8c2e940ba175ad1841b2a76a5ffc56bb1234",
+          "fixture_commit_note": "Synthetic fixture label, not a fetched Git commit; implementation hashes freeze the executable fixture.",
+          "original_failure": "TimeoutError: locator.click: Timeout 5000ms exceeded. #release-overlay intercepts pointer events.",
+          "input_snapshot_sha256": "f81e192864866a115fafa6758314cd7d7ac629de272ed12df8438055ea73ac0e",
+          "evidence_ids": [
+            "e-log",
+            "e-dom",
+            "e-diff",
+            "e-runbook",
+            "e-screenshot"
+          ],
+          "retrieved_ids": [
+            "e-log",
+            "e-dom",
+            "e-diff",
+            "e-runbook",
+            "e-screenshot"
+          ],
+          "checks": {
+            "completed": true,
+            "chat_mode": true,
+            "two_live_stages": true,
+            "expected_cause": true,
+            "expected_outcome": true,
+            "missing_evidence_reported": true,
+            "browser_evidence_or_abstention": true
+          },
+          "passed": true,
+          "metrics": {
+            "duration_ms": 18289,
+            "model_calls": 2,
+            "input_tokens": 2910,
+            "output_tokens": 223,
+            "estimated_model_cost_usd": null
+          },
+          "observed_causes": [
+            "overlay"
+          ],
+          "observed_experiments": [
+            {
+              "intervention": "remove_overlay",
+              "baseline_passes": 0,
+              "intervention_passes": 3,
+              "repetitions": 3,
+              "verdict": "supported"
+            }
+          ],
+          "artifact_sha256": {
+            "h1-remove_overlay-0c9c8df8a8-baseline.png": "6bd7f6115ba511962ba750d50aeffd5e8050eb80a1f4e08d9ed6b5bcf426974e",
+            "h1-remove_overlay-0c9c8df8a8-baseline.zip": "6379522561190abd7a9e94992a5e77050cf0e4a021dc9d4996a5d66350fb7097",
+            "h1-remove_overlay-0c9c8df8a8-intervention.png": "2936ecd70ba677498b2ddd267f7978e7920417c456a63c48fd90908f7a212a9d",
+            "h1-remove_overlay-0c9c8df8a8-intervention.zip": "f266a266f184a4ee0ae169eae451e6c15cef36ae40d9454f37c2364e8e113272"
+          },
+          "diagnosis": [
+            {
+              "id": "h1",
+              "cause": "overlay",
+              "title": "Fixed-position release overlay intercepts click events on checkout button",
+              "explanation": "The DOM shows a #release-overlay element with fixed positioning and likely high z-index, coexisting with the checkout button. The test log reports a timeout due to pointer event interception. The code change confirms the overlay is styled to cover the viewport, which would block clicks to underlying elements like the checkout button.",
+              "evidence_ids": [
+                "e-log",
+                "e-dom",
+                "e-diff"
+              ],
+              "status": "supported"
+            }
+          ],
+          "plan": [
+            {
+              "hypothesis_id": "h1",
+              "intervention": "remove_overlay",
+              "rationale": "The overlay with fixed positioning and high z-index is likely intercepting pointer events. Removing it tests if the checkout button becomes clickable.",
+              "repetitions": 3
+            }
+          ],
+          "experiments": [
+            {
+              "hypothesis_id": "h1",
+              "intervention": "remove_overlay",
+              "baseline_passes": 0,
+              "intervention_passes": 3,
+              "repetitions": 3,
+              "verdict": "supported",
+              "duration_ms": 10339,
+              "observations": [
+                "baseline 1: FAIL \u2014 Locator.click: Timeout 3000ms exceeded.",
+                "intervention 1: PASS \u2014 checkout interaction",
+                "baseline 2: FAIL \u2014 Locator.click: Timeout 3000ms exceeded.",
+                "intervention 2: PASS \u2014 checkout interaction",
+                "baseline 3: FAIL \u2014 Locator.click: Timeout 3000ms exceeded.",
+                "intervention 3: PASS \u2014 checkout interaction"
+              ],
+              "artifacts": [
+                "h1-remove_overlay-0c9c8df8a8-baseline.png",
+                "h1-remove_overlay-0c9c8df8a8-baseline.zip",
+                "h1-remove_overlay-0c9c8df8a8-intervention.png",
+                "h1-remove_overlay-0c9c8df8a8-intervention.zip"
+              ],
+              "environment": {
+                "runner": "fixture-runner-v2",
+                "action_timeout_ms": "3000",
+                "chromium": "151.0.7922.34",
+                "platform": "Windows-10-10.0.26200-SP0",
+                "fixture_sha256": "6857f4edcc9071a5437064e834622acf7e2726c75520ea2f9f6c4af7d60796ad",
+                "network": "blocked",
+                "scenario": "overlay"
+              }
+            }
+          ],
+          "model_usage": [
+            {
+              "task": "Propose at most three causes supported by incident-specific observations, ordered by evidence strength. If none is supported, return one unknown hypothesis. Use status=proposed.",
+              "model": "Qwen/Qwen3-235B-A22B-Instruct-2507:novita",
+              "response_model": "qwen/qwen3-235b-a22b-instruct-2507",
+              "prompt_version": "failurelab-agents-v3",
+              "tool_description_version": "reviewed-interventions-v1",
+              "tool_schema_sha256": "2f64287f9ce6fd7928ec519bedd825b884e36239c3548f4a0a0fcd5cefbefa93",
+              "duration_ms": 4820,
+              "input_tokens": 1393,
+              "output_tokens": 148
+            },
+            {
+              "task": "Choose bounded interventions that discriminate between evidence-supported hypotheses, using the intervention descriptions in the schema. Prefer a reviewed application change that tests the proposed mechanism; repeat_baseline measures repeatability only and cannot test causality. No arbitrary code or commands. Never plan an experiment for an unknown cause; return an empty experiments list when all causes are unknown.",
+              "model": "Qwen/Qwen3-235B-A22B-Instruct-2507:novita",
+              "response_model": "qwen/qwen3-235b-a22b-instruct-2507",
+              "prompt_version": "failurelab-agents-v3",
+              "tool_description_version": "reviewed-interventions-v1",
+              "tool_schema_sha256": "2f64287f9ce6fd7928ec519bedd825b884e36239c3548f4a0a0fcd5cefbefa93",
+              "duration_ms": 2085,
+              "input_tokens": 1517,
+              "output_tokens": 75
+            }
+          ],
+          "provider_errors": [],
+          "error": null,
+          "human_review": "pending",
+          "checkpoint": {
+            "id": "1f1af425-6cfc-6edf-8006-12acc643e847",
+            "next": [],
+            "created_at": "2026-09-13T07:11:28.435785+00:00"
+          },
+          "agent_diagnosis": {
+            "hypotheses": [
+              {
+                "id": "h1",
+                "cause": "overlay",
+                "title": "Fixed-position release overlay intercepts click events on checkout button",
+                "explanation": "The DOM shows a #release-overlay element with fixed positioning and likely high z-index, coexisting with the checkout button. The test log reports a timeout due to pointer event interception. The code change confirms the overlay is styled to cover the viewport, which would block clicks to underlying elements like the checkout button.",
+                "evidence_ids": [
+                  "e-log",
+                  "e-dom",
+                  "e-diff"
+                ],
+                "status": "proposed"
+              }
+            ],
+            "missing_evidence": []
+          },
+          "model_call_attempts": 2
+        },
+        {
+          "scenario": "selector",
+          "case_id": "inv-e0f7858b1a44",
+          "status": "passed",
+          "fixture_commit_label": "a13f8c2e940ba175ad1841b2a76a5ffc56bb1234",
+          "fixture_commit_note": "Synthetic fixture label, not a fetched Git commit; implementation hashes freeze the executable fixture.",
+          "original_failure": "TimeoutError: waiting for locator('[data-testid=search-input]'); resolved to 0 elements.",
+          "input_snapshot_sha256": "724f1ea3f7032204be81c9b95325499c126cd65153edc1dc17a33449b633c19c",
+          "evidence_ids": [
+            "e-log",
+            "e-dom",
+            "e-diff",
+            "e-runbook",
+            "e-screenshot"
+          ],
+          "retrieved_ids": [
+            "e-log",
+            "e-diff",
+            "e-dom",
+            "e-runbook",
+            "e-screenshot"
+          ],
+          "checks": {
+            "completed": true,
+            "chat_mode": true,
+            "two_live_stages": true,
+            "expected_cause": true,
+            "expected_outcome": true,
+            "missing_evidence_reported": true,
+            "browser_evidence_or_abstention": true
+          },
+          "passed": true,
+          "metrics": {
+            "duration_ms": 18928,
+            "model_calls": 2,
+            "input_tokens": 2880,
+            "output_tokens": 221,
+            "estimated_model_cost_usd": null
+          },
+          "observed_causes": [
+            "selector"
+          ],
+          "observed_experiments": [
+            {
+              "intervention": "restore_selector",
+              "baseline_passes": 0,
+              "intervention_passes": 3,
+              "repetitions": 3,
+              "verdict": "supported"
+            }
+          ],
+          "artifact_sha256": {
+            "h1-restore_selector-52dc282c4d-baseline.png": "669a9a32079e61b41e5a2cd8079ac356275682a0b0631a9d1e6e9150da45da3f",
+            "h1-restore_selector-52dc282c4d-baseline.zip": "ecf5501609073be2e60728db9e60999ebf556b5c6316b84e5e3f15724bdc57bb",
+            "h1-restore_selector-52dc282c4d-intervention.png": "a485eaa2d130a9ccc407c6610c7712153228a0bb80e800241845dbba3d386ba2",
+            "h1-restore_selector-52dc282c4d-intervention.zip": "79f9e1b57aeeafc8ecc02bb85cda623f67b848fea89b17e65b8d68f63419cc71"
+          },
+          "diagnosis": [
+            {
+              "id": "h1",
+              "cause": "selector",
+              "title": "Test fails due to changed data-testid selector",
+              "explanation": "The test expects an element with data-testid='search-input', but the DOM contains data-testid='catalog-search'. The code diff confirms this attribute was changed, and the failure log shows a timeout from waiting for the old selector. This directly explains the test failure.",
+              "evidence_ids": [
+                "e-log",
+                "e-diff",
+                "e-dom"
+              ],
+              "status": "supported"
+            }
+          ],
+          "plan": [
+            {
+              "hypothesis_id": "h1",
+              "intervention": "restore_selector",
+              "rationale": "The failure log shows a timeout for '[data-testid=search-input]', the DOM contains 'catalog-search', and the code diff confirms the selector change. Restoring the original selector tests if this contract mismatch is the cause.",
+              "repetitions": 3
+            }
+          ],
+          "experiments": [
+            {
+              "hypothesis_id": "h1",
+              "intervention": "restore_selector",
+              "baseline_passes": 0,
+              "intervention_passes": 3,
+              "repetitions": 3,
+              "verdict": "supported",
+              "duration_ms": 10459,
+              "observations": [
+                "baseline 1: FAIL \u2014 Locator.fill: Timeout 3000ms exceeded.",
+                "intervention 1: PASS \u2014 search locator resolved",
+                "baseline 2: FAIL \u2014 Locator.fill: Timeout 3000ms exceeded.",
+                "intervention 2: PASS \u2014 search locator resolved",
+                "baseline 3: FAIL \u2014 Locator.fill: Timeout 3000ms exceeded.",
+                "intervention 3: PASS \u2014 search locator resolved"
+              ],
+              "artifacts": [
+                "h1-restore_selector-52dc282c4d-baseline.png",
+                "h1-restore_selector-52dc282c4d-baseline.zip",
+                "h1-restore_selector-52dc282c4d-intervention.png",
+                "h1-restore_selector-52dc282c4d-intervention.zip"
+              ],
+              "environment": {
+                "runner": "fixture-runner-v2",
+                "action_timeout_ms": "3000",
+                "chromium": "151.0.7922.34",
+                "platform": "Windows-10-10.0.26200-SP0",
+                "fixture_sha256": "6857f4edcc9071a5437064e834622acf7e2726c75520ea2f9f6c4af7d60796ad",
+                "network": "blocked",
+                "scenario": "selector"
+              }
+            }
+          ],
+          "model_usage": [
+            {
+              "task": "Propose at most three causes supported by incident-specific observations, ordered by evidence strength. If none is supported, return one unknown hypothesis. Use status=proposed.",
+              "model": "Qwen/Qwen3-235B-A22B-Instruct-2507:novita",
+              "response_model": "qwen/qwen3-235b-a22b-instruct-2507",
+              "prompt_version": "failurelab-agents-v3",
+              "tool_description_version": "reviewed-interventions-v1",
+              "tool_schema_sha256": "2f64287f9ce6fd7928ec519bedd825b884e36239c3548f4a0a0fcd5cefbefa93",
+              "duration_ms": 3079,
+              "input_tokens": 1384,
+              "output_tokens": 129
+            },
+            {
+              "task": "Choose bounded interventions that discriminate between evidence-supported hypotheses, using the intervention descriptions in the schema. Prefer a reviewed application change that tests the proposed mechanism; repeat_baseline measures repeatability only and cannot test causality. No arbitrary code or commands. Never plan an experiment for an unknown cause; return an empty experiments list when all causes are unknown.",
+              "model": "Qwen/Qwen3-235B-A22B-Instruct-2507:novita",
+              "response_model": "qwen/qwen3-235b-a22b-instruct-2507",
+              "prompt_version": "failurelab-agents-v3",
+              "tool_description_version": "reviewed-interventions-v1",
+              "tool_schema_sha256": "2f64287f9ce6fd7928ec519bedd825b884e36239c3548f4a0a0fcd5cefbefa93",
+              "duration_ms": 4731,
+              "input_tokens": 1496,
+              "output_tokens": 92
+            }
+          ],
+          "provider_errors": [],
+          "error": null,
+          "human_review": "pending",
+          "checkpoint": {
+            "id": "1f1af426-2d3c-6c7f-8006-dc36697c3bc3",
+            "next": [],
+            "created_at": "2026-09-13T07:11:48.594598+00:00"
+          },
+          "agent_diagnosis": {
+            "hypotheses": [
+              {
+                "id": "h1",
+                "cause": "selector",
+                "title": "Test fails due to changed data-testid selector",
+                "explanation": "The test expects an element with data-testid='search-input', but the DOM contains data-testid='catalog-search'. The code diff confirms this attribute was changed, and the failure log shows a timeout from waiting for the old selector. This directly explains the test failure.",
+                "evidence_ids": [
+                  "e-log",
+                  "e-diff",
+                  "e-dom"
+                ],
+                "status": "proposed"
+              }
+            ],
+            "missing_evidence": []
+          },
+          "model_call_attempts": 2
+        },
+        {
+          "scenario": "api_contract",
+          "case_id": "inv-a542e2b4c87e",
+          "status": "provider_unavailable",
+          "fixture_commit_label": "a13f8c2e940ba175ad1841b2a76a5ffc56bb1234",
+          "fixture_commit_note": "Synthetic fixture label, not a fetched Git commit; implementation hashes freeze the executable fixture.",
+          "original_failure": "TypeError: Cannot read properties of undefined (reading 'name'). GET /api/user returned 200.",
+          "input_snapshot_sha256": "b8633668122aaaf86cb241ba46181dc0ed6a8ab49eb693184186668d93b0ec62",
+          "evidence_ids": [
+            "e-log",
+            "e-dom",
+            "e-diff",
+            "e-runbook",
+            "e-screenshot"
+          ],
+          "retrieved_ids": [
+            "e-log",
+            "e-diff",
+            "e-dom",
+            "e-screenshot",
+            "e-runbook"
+          ],
+          "checks": {
+            "completed": false,
+            "chat_mode": false,
+            "two_live_stages": false,
+            "expected_cause": false,
+            "expected_outcome": false,
+            "missing_evidence_reported": true,
+            "browser_evidence_or_abstention": false
+          },
+          "passed": false,
+          "metrics": {},
+          "observed_causes": [],
+          "observed_experiments": [],
+          "artifact_sha256": {},
+          "diagnosis": [],
+          "plan": [],
+          "experiments": [],
+          "model_usage": [
+            {
+              "task": "Propose at most three causes supported by incident-specific observations, ordered by evidence strength. If none is supported, return one unknown hypothesis. Use status=proposed.",
+              "model": "Qwen/Qwen3-235B-A22B-Instruct-2507:novita",
+              "response_model": "qwen/qwen3-235b-a22b-instruct-2507",
+              "prompt_version": "failurelab-agents-v3",
+              "tool_description_version": "reviewed-interventions-v1",
+              "tool_schema_sha256": "2f64287f9ce6fd7928ec519bedd825b884e36239c3548f4a0a0fcd5cefbefa93",
+              "duration_ms": 4084,
+              "input_tokens": 1407,
+              "output_tokens": 172
+            }
+          ],
+          "provider_errors": [
+            {
+              "category": "provider_unavailable",
+              "http_status": 402,
+              "transport_error": null,
+              "duration_ms": 448
+            }
+          ],
+          "error": "Model provider returned HTTP 402; no baseline substitution was made",
+          "human_review": "pending",
+          "checkpoint": {
+            "id": "1f1af426-636d-6325-8003-c0b04b9e48a4",
+            "next": [
+              "plan"
+            ],
+            "created_at": "2026-09-13T07:11:54.276739+00:00"
+          },
+          "agent_diagnosis": {
+            "hypotheses": [
+              {
+                "id": "h1",
+                "cause": "api_contract",
+                "title": "API response structure change causes property access failure",
+                "explanation": "The test fails with 'Cannot read properties of undefined (reading 'name')', which aligns with the code expecting 'response.user.name' but the API now returning 'data' instead of 'user'. The diff shows the response changed from { user: { name: 'Ada' } } to { data: { name: 'Ada' } }, breaking the consumer. The 200 status indicates no network error, supporting a contract mismatch.",
+                "evidence_ids": [
+                  "e-log",
+                  "e-diff"
+                ],
+                "status": "proposed"
+              }
+            ],
+            "missing_evidence": []
+          },
+          "model_call_attempts": 2
+        }
+      ],
+      "passed": false,
+      "acceptance_id": "8026bc43165447598a0acdc1923a1592"
+    },
+    {
+      "started_at": "2026-09-13T07:13:57.091369+00:00",
+      "mode": "chat",
+      "model": "Qwen/Qwen3-235B-A22B-Instruct-2507:novita",
+      "provider": "https://router.huggingface.co/v1",
+      "prompt_version": "failurelab-agents-v3",
+      "tool_description_version": "reviewed-interventions-v1",
+      "tool_schema_sha256": "2f64287f9ce6fd7928ec519bedd825b884e36239c3548f4a0a0fcd5cefbefa93",
+      "vision": false,
+      "implementation_commit": "ca68583b5b2cca6cd9bf3b5432f3943938001c0e",
+      "implementation_dirty": true,
+      "implementation_sha256": {
+        "src/failurelab/fixtures.py": "159c8340058cbfe28b629d162ab56de2ea7e47ee940ad304ef559dc1d207a447",
+        "src/failurelab/runner.py": "09cee698328130600c68ae202d3e8c8420d8ed10bf1305efb24526751c9034a2",
+        "src/failurelab/agents.py": "892cf2cdd582b8ee399fc973cca22fd3d36acde7f449639d2693b44e17181aa9",
+        "src/failurelab/schemas.py": "0e04c68750eee79a1296a96f1ad1f8308141e03cbe8fe549d2a66e16076b5bf5",
+        "src/failurelab/workflow.py": "a5e76a0994ec2e4f1a6e8e978b486d5afec099fe1f9251ce182186ffa7bbfa71",
+        "scripts/verify_live_agents.py": "a729cb33b557bc651dfe652115543f3920acdb06ba2f7cf265beb73c094aa678"
+      },
+      "scope": "Four owned synthetic fixtures; live integration acceptance, not held-out accuracy.",
+      "cases": [
+        {
+          "scenario": "overlay",
+          "case_id": "inv-6f0b8d20bcbc",
+          "status": "passed",
+          "fixture_commit_label": "a13f8c2e940ba175ad1841b2a76a5ffc56bb1234",
+          "fixture_commit_note": "Synthetic fixture label, not a fetched Git commit; implementation hashes freeze the executable fixture.",
+          "original_failure": "TimeoutError: locator.click: Timeout 5000ms exceeded. #release-overlay intercepts pointer events.",
+          "input_snapshot_sha256": "f81e192864866a115fafa6758314cd7d7ac629de272ed12df8438055ea73ac0e",
+          "evidence_ids": [
+            "e-log",
+            "e-dom",
+            "e-diff",
+            "e-runbook",
+            "e-screenshot"
+          ],
+          "retrieved_ids": [
+            "e-log",
+            "e-dom",
+            "e-diff",
+            "e-runbook",
+            "e-screenshot"
+          ],
+          "checks": {
+            "completed": true,
+            "chat_mode": true,
+            "two_live_stages": true,
+            "expected_cause": true,
+            "expected_outcome": true,
+            "missing_evidence_reported": true,
+            "browser_evidence_or_abstention": true
+          },
+          "passed": true,
+          "metrics": {
+            "duration_ms": 18703,
+            "model_calls": 2,
+            "input_tokens": 2908,
+            "output_tokens": 229,
+            "estimated_model_cost_usd": null
+          },
+          "observed_causes": [
+            "overlay"
+          ],
+          "observed_experiments": [
+            {
+              "intervention": "remove_overlay",
+              "baseline_passes": 0,
+              "intervention_passes": 3,
+              "repetitions": 3,
+              "verdict": "supported"
+            }
+          ],
+          "artifact_sha256": {
+            "h1-remove_overlay-34ba6da28b-baseline.png": "6bd7f6115ba511962ba750d50aeffd5e8050eb80a1f4e08d9ed6b5bcf426974e",
+            "h1-remove_overlay-34ba6da28b-baseline.zip": "aff1a91034a23a1fe4e079aefaad53fa68b4415b2ac070ce563723ac4bdd81c3",
+            "h1-remove_overlay-34ba6da28b-intervention.png": "2936ecd70ba677498b2ddd267f7978e7920417c456a63c48fd90908f7a212a9d",
+            "h1-remove_overlay-34ba6da28b-intervention.zip": "2a8bff5eb57f1c31c1b7e6dd64049d8b3c7a644df01d30dc055e5099bdee6067"
+          },
+          "diagnosis": [
+            {
+              "id": "h1",
+              "cause": "overlay",
+              "title": "Fixed-position release overlay intercepts click events on checkout button",
+              "explanation": "The DOM shows a visible '#release-overlay' element with fixed positioning and high z-index, which matches the CSS change that positions it over the entire viewport. The timeout error indicates a click was blocked due to pointer event interception, consistent with an overlay preventing interaction with underlying elements like the checkout button.",
+              "evidence_ids": [
+                "e-log",
+                "e-dom",
+                "e-diff"
+              ],
+              "status": "supported"
+            }
+          ],
+          "plan": [
+            {
+              "hypothesis_id": "h1",
+              "intervention": "remove_overlay",
+              "rationale": "The log, DOM, and code diff show a fixed-position overlay with high z-index that blocks pointer events on the checkout button. Removing it tests if interaction is restored.",
+              "repetitions": 3
+            }
+          ],
+          "experiments": [
+            {
+              "hypothesis_id": "h1",
+              "intervention": "remove_overlay",
+              "baseline_passes": 0,
+              "intervention_passes": 3,
+              "repetitions": 3,
+              "verdict": "supported",
+              "duration_ms": 10238,
+              "observations": [
+                "baseline 1: FAIL \u2014 Locator.click: Timeout 3000ms exceeded.",
+                "intervention 1: PASS \u2014 checkout interaction",
+                "baseline 2: FAIL \u2014 Locator.click: Timeout 3000ms exceeded.",
+                "intervention 2: PASS \u2014 checkout interaction",
+                "baseline 3: FAIL \u2014 Locator.click: Timeout 3000ms exceeded.",
+                "intervention 3: PASS \u2014 checkout interaction"
+              ],
+              "artifacts": [
+                "h1-remove_overlay-34ba6da28b-baseline.png",
+                "h1-remove_overlay-34ba6da28b-baseline.zip",
+                "h1-remove_overlay-34ba6da28b-intervention.png",
+                "h1-remove_overlay-34ba6da28b-intervention.zip"
+              ],
+              "environment": {
+                "runner": "fixture-runner-v2",
+                "action_timeout_ms": "3000",
+                "chromium": "151.0.7922.34",
+                "platform": "Windows-10-10.0.26200-SP0",
+                "fixture_sha256": "6857f4edcc9071a5437064e834622acf7e2726c75520ea2f9f6c4af7d60796ad",
+                "network": "blocked",
+                "scenario": "overlay"
+              }
+            }
+          ],
+          "model_usage": [
+            {
+              "task": "Propose at most three causes supported by incident-specific observations, ordered by evidence strength. If none is supported, return one unknown hypothesis. Use status=proposed.",
+              "model": "Qwen/Qwen3-235B-A22B-Instruct-2507:novita",
+              "response_model": "qwen/qwen3-235b-a22b-instruct-2507",
+              "prompt_version": "failurelab-agents-v3",
+              "tool_description_version": "reviewed-interventions-v1",
+              "tool_schema_sha256": "2f64287f9ce6fd7928ec519bedd825b884e36239c3548f4a0a0fcd5cefbefa93",
+              "duration_ms": 3569,
+              "input_tokens": 1393,
+              "output_tokens": 146
+            },
+            {
+              "task": "Choose bounded interventions that discriminate between evidence-supported hypotheses, using the intervention descriptions in the schema. Prefer a reviewed application change that tests the proposed mechanism; repeat_baseline measures repeatability only and cannot test causality. No arbitrary code or commands. Never plan an experiment for an unknown cause; return an empty experiments list when all causes are unknown.",
+              "model": "Qwen/Qwen3-235B-A22B-Instruct-2507:novita",
+              "response_model": "qwen/qwen3-235b-a22b-instruct-2507",
+              "prompt_version": "failurelab-agents-v3",
+              "tool_description_version": "reviewed-interventions-v1",
+              "tool_schema_sha256": "2f64287f9ce6fd7928ec519bedd825b884e36239c3548f4a0a0fcd5cefbefa93",
+              "duration_ms": 3024,
+              "input_tokens": 1515,
+              "output_tokens": 83
+            }
+          ],
+          "provider_errors": [],
+          "error": null,
+          "human_review": "pending",
+          "checkpoint": {
+            "id": "1f1af42b-b8e9-6f55-8006-ca4528eae0e4",
+            "next": [],
+            "created_at": "2026-09-13T07:14:17.457465+00:00"
+          },
+          "agent_diagnosis": {
+            "hypotheses": [
+              {
+                "id": "h1",
+                "cause": "overlay",
+                "title": "Fixed-position release overlay intercepts click events on checkout button",
+                "explanation": "The DOM shows a visible '#release-overlay' element with fixed positioning and high z-index, which matches the CSS change that positions it over the entire viewport. The timeout error indicates a click was blocked due to pointer event interception, consistent with an overlay preventing interaction with underlying elements like the checkout button.",
+                "evidence_ids": [
+                  "e-log",
+                  "e-dom",
+                  "e-diff"
+                ],
+                "status": "proposed"
+              }
+            ],
+            "missing_evidence": []
+          },
+          "model_call_attempts": 2
+        },
+        {
+          "scenario": "selector",
+          "case_id": "inv-b73890a421e5",
+          "status": "passed",
+          "fixture_commit_label": "a13f8c2e940ba175ad1841b2a76a5ffc56bb1234",
+          "fixture_commit_note": "Synthetic fixture label, not a fetched Git commit; implementation hashes freeze the executable fixture.",
+          "original_failure": "TimeoutError: waiting for locator('[data-testid=search-input]'); resolved to 0 elements.",
+          "input_snapshot_sha256": "724f1ea3f7032204be81c9b95325499c126cd65153edc1dc17a33449b633c19c",
+          "evidence_ids": [
+            "e-log",
+            "e-dom",
+            "e-diff",
+            "e-runbook",
+            "e-screenshot"
+          ],
+          "retrieved_ids": [
+            "e-log",
+            "e-diff",
+            "e-dom",
+            "e-runbook",
+            "e-screenshot"
+          ],
+          "checks": {
+            "completed": true,
+            "chat_mode": true,
+            "two_live_stages": true,
+            "expected_cause": true,
+            "expected_outcome": true,
+            "missing_evidence_reported": true,
+            "browser_evidence_or_abstention": true
+          },
+          "passed": true,
+          "metrics": {
+            "duration_ms": 19440,
+            "model_calls": 2,
+            "input_tokens": 2880,
+            "output_tokens": 227,
+            "estimated_model_cost_usd": null
+          },
+          "observed_causes": [
+            "selector"
+          ],
+          "observed_experiments": [
+            {
+              "intervention": "restore_selector",
+              "baseline_passes": 0,
+              "intervention_passes": 3,
+              "repetitions": 3,
+              "verdict": "supported"
+            }
+          ],
+          "artifact_sha256": {
+            "h1-restore_selector-852292d31c-baseline.png": "669a9a32079e61b41e5a2cd8079ac356275682a0b0631a9d1e6e9150da45da3f",
+            "h1-restore_selector-852292d31c-baseline.zip": "6b52073f75aac0bd4d659544c3050c5fa2ef82996686a39386b0406966a77fb3",
+            "h1-restore_selector-852292d31c-intervention.png": "a485eaa2d130a9ccc407c6610c7712153228a0bb80e800241845dbba3d386ba2",
+            "h1-restore_selector-852292d31c-intervention.zip": "30cfeb04100cf9c86262c4e23cb1e355b94c020fee4af8833a92c3bb0b52c98d"
+          },
+          "diagnosis": [
+            {
+              "id": "h1",
+              "cause": "selector",
+              "title": "Test fails due to changed data-testid selector",
+              "explanation": "The test expects an element with data-testid='search-input', but the DOM contains data-testid='catalog-search'. The code diff confirms this change was introduced, and the failure log shows a timeout from waiting for the old selector. This directly explains the test failure.",
+              "evidence_ids": [
+                "e-log",
+                "e-diff",
+                "e-dom"
+              ],
+              "status": "supported"
+            }
+          ],
+          "plan": [
+            {
+              "hypothesis_id": "h1",
+              "intervention": "restore_selector",
+              "rationale": "The hypothesis states the test fails due to a changed data-testid selector. The evidence shows the test expects 'search-input' but the DOM has 'catalog-search'. Restoring the selector contract directly tests this mechanism.",
+              "repetitions": 3
+            }
+          ],
+          "experiments": [
+            {
+              "hypothesis_id": "h1",
+              "intervention": "restore_selector",
+              "baseline_passes": 0,
+              "intervention_passes": 3,
+              "repetitions": 3,
+              "verdict": "supported",
+              "duration_ms": 10926,
+              "observations": [
+                "baseline 1: FAIL \u2014 Locator.fill: Timeout 3000ms exceeded.",
+                "intervention 1: PASS \u2014 search locator resolved",
+                "baseline 2: FAIL \u2014 Locator.fill: Timeout 3000ms exceeded.",
+                "intervention 2: PASS \u2014 search locator resolved",
+                "baseline 3: FAIL \u2014 Locator.fill: Timeout 3000ms exceeded.",
+                "intervention 3: PASS \u2014 search locator resolved"
+              ],
+              "artifacts": [
+                "h1-restore_selector-852292d31c-baseline.png",
+                "h1-restore_selector-852292d31c-baseline.zip",
+                "h1-restore_selector-852292d31c-intervention.png",
+                "h1-restore_selector-852292d31c-intervention.zip"
+              ],
+              "environment": {
+                "runner": "fixture-runner-v2",
+                "action_timeout_ms": "3000",
+                "chromium": "151.0.7922.34",
+                "platform": "Windows-10-10.0.26200-SP0",
+                "fixture_sha256": "6857f4edcc9071a5437064e834622acf7e2726c75520ea2f9f6c4af7d60796ad",
+                "network": "blocked",
+                "scenario": "selector"
+              }
+            }
+          ],
+          "model_usage": [
+            {
+              "task": "Propose at most three causes supported by incident-specific observations, ordered by evidence strength. If none is supported, return one unknown hypothesis. Use status=proposed.",
+              "model": "Qwen/Qwen3-235B-A22B-Instruct-2507:novita",
+              "response_model": "qwen/qwen3-235b-a22b-instruct-2507",
+              "prompt_version": "failurelab-agents-v3",
+              "tool_description_version": "reviewed-interventions-v1",
+              "tool_schema_sha256": "2f64287f9ce6fd7928ec519bedd825b884e36239c3548f4a0a0fcd5cefbefa93",
+              "duration_ms": 3585,
+              "input_tokens": 1384,
+              "output_tokens": 136
+            },
+            {
+              "task": "Choose bounded interventions that discriminate between evidence-supported hypotheses, using the intervention descriptions in the schema. Prefer a reviewed application change that tests the proposed mechanism; repeat_baseline measures repeatability only and cannot test causality. No arbitrary code or commands. Never plan an experiment for an unknown cause; return an empty experiments list when all causes are unknown.",
+              "model": "Qwen/Qwen3-235B-A22B-Instruct-2507:novita",
+              "response_model": "qwen/qwen3-235b-a22b-instruct-2507",
+              "prompt_version": "failurelab-agents-v3",
+              "tool_description_version": "reviewed-interventions-v1",
+              "tool_schema_sha256": "2f64287f9ce6fd7928ec519bedd825b884e36239c3548f4a0a0fcd5cefbefa93",
+              "duration_ms": 2689,
+              "input_tokens": 1496,
+              "output_tokens": 91
+            }
+          ],
+          "provider_errors": [],
+          "error": null,
+          "human_review": "pending",
+          "checkpoint": {
+            "id": "1f1af42c-7ad5-6bae-8006-1d1783ff6d68",
+            "next": [],
+            "created_at": "2026-09-13T07:14:37.792555+00:00"
+          },
+          "agent_diagnosis": {
+            "hypotheses": [
+              {
+                "id": "h1",
+                "cause": "selector",
+                "title": "Test fails due to changed data-testid selector",
+                "explanation": "The test expects an element with data-testid='search-input', but the DOM contains data-testid='catalog-search'. The code diff confirms this change was introduced, and the failure log shows a timeout from waiting for the old selector. This directly explains the test failure.",
+                "evidence_ids": [
+                  "e-log",
+                  "e-diff",
+                  "e-dom"
+                ],
+                "status": "proposed"
+              }
+            ],
+            "missing_evidence": []
+          },
+          "model_call_attempts": 2
+        },
+        {
+          "scenario": "api_contract",
+          "case_id": "inv-5d45489ea6df",
+          "status": "passed",
+          "fixture_commit_label": "a13f8c2e940ba175ad1841b2a76a5ffc56bb1234",
+          "fixture_commit_note": "Synthetic fixture label, not a fetched Git commit; implementation hashes freeze the executable fixture.",
+          "original_failure": "TypeError: Cannot read properties of undefined (reading 'name'). GET /api/user returned 200.",
+          "input_snapshot_sha256": "b8633668122aaaf86cb241ba46181dc0ed6a8ab49eb693184186668d93b0ec62",
+          "evidence_ids": [
+            "e-log",
+            "e-dom",
+            "e-diff",
+            "e-runbook",
+            "e-screenshot"
+          ],
+          "retrieved_ids": [
+            "e-log",
+            "e-diff",
+            "e-dom",
+            "e-screenshot",
+            "e-runbook"
+          ],
+          "checks": {
+            "completed": true,
+            "chat_mode": true,
+            "two_live_stages": true,
+            "expected_cause": true,
+            "expected_outcome": true,
+            "missing_evidence_reported": true,
+            "browser_evidence_or_abstention": true
+          },
+          "passed": true,
+          "metrics": {
+            "duration_ms": 9047,
+            "model_calls": 2,
+            "input_tokens": 2935,
+            "output_tokens": 248,
+            "estimated_model_cost_usd": null
+          },
+          "observed_causes": [
+            "api_contract"
+          ],
+          "observed_experiments": [
+            {
+              "intervention": "restore_response",
+              "baseline_passes": 0,
+              "intervention_passes": 3,
+              "repetitions": 3,
+              "verdict": "supported"
+            }
+          ],
+          "artifact_sha256": {
+            "h1-restore_response-f76f635c85-baseline.png": "28788299d3558205c875d0e0a93b0ef5f7e70d384160a46bbc8d5826d363529b",
+            "h1-restore_response-f76f635c85-baseline.zip": "2ad513da712884643b85a200abe8a0dc1934a729aac02e9ba00a2d995eeabe65",
+            "h1-restore_response-f76f635c85-intervention.png": "669a9a32079e61b41e5a2cd8079ac356275682a0b0631a9d1e6e9150da45da3f",
+            "h1-restore_response-f76f635c85-intervention.zip": "b09756e7af835a9b72ca8cd1d3cbc78da133eda6aeaf3b19ef5ada086ef8286f"
+          },
+          "diagnosis": [
+            {
+              "id": "h1",
+              "cause": "api_contract",
+              "title": "API response structure change causes property access failure",
+              "explanation": "The test fails with 'Cannot read properties of undefined (reading 'name')', which aligns with the code expecting 'response.user.name' but the API now returning 'response.data.name' as shown in the diff. The 200 status indicates no network error, so the issue stems from a contract mismatch.",
+              "evidence_ids": [
+                "e-log",
+                "e-diff"
+              ],
+              "status": "supported"
+            }
+          ],
+          "plan": [
+            {
+              "hypothesis_id": "h1",
+              "intervention": "restore_response",
+              "rationale": "The error 'Cannot read properties of undefined (reading 'name')' and the diff showing a shift from 'user' to 'data' in the response structure indicate an API contract change. Restoring the original response structure will test if this contract mismatch is the cause.",
+              "repetitions": 3
+            }
+          ],
+          "experiments": [
+            {
+              "hypothesis_id": "h1",
+              "intervention": "restore_response",
+              "baseline_passes": 0,
+              "intervention_passes": 3,
+              "repetitions": 3,
+              "verdict": "supported",
+              "duration_ms": 1137,
+              "observations": [
+                "baseline 1: FAIL \u2014 account response rendered",
+                "intervention 1: PASS \u2014 account response rendered",
+                "baseline 2: FAIL \u2014 account response rendered",
+                "intervention 2: PASS \u2014 account response rendered",
+                "baseline 3: FAIL \u2014 account response rendered",
+                "intervention 3: PASS \u2014 account response rendered"
+              ],
+              "artifacts": [
+                "h1-restore_response-f76f635c85-baseline.png",
+                "h1-restore_response-f76f635c85-baseline.zip",
+                "h1-restore_response-f76f635c85-intervention.png",
+                "h1-restore_response-f76f635c85-intervention.zip"
+              ],
+              "environment": {
+                "runner": "fixture-runner-v2",
+                "action_timeout_ms": "3000",
+                "chromium": "151.0.7922.34",
+                "platform": "Windows-10-10.0.26200-SP0",
+                "fixture_sha256": "6857f4edcc9071a5437064e834622acf7e2726c75520ea2f9f6c4af7d60796ad",
+                "network": "blocked",
+                "scenario": "api_contract"
+              }
+            }
+          ],
+          "model_usage": [
+            {
+              "task": "Propose at most three causes supported by incident-specific observations, ordered by evidence strength. If none is supported, return one unknown hypothesis. Use status=proposed.",
+              "model": "Qwen/Qwen3-235B-A22B-Instruct-2507:novita",
+              "response_model": "qwen/qwen3-235b-a22b-instruct-2507",
+              "prompt_version": "failurelab-agents-v3",
+              "tool_description_version": "reviewed-interventions-v1",
+              "tool_schema_sha256": "2f64287f9ce6fd7928ec519bedd825b884e36239c3548f4a0a0fcd5cefbefa93",
+              "duration_ms": 4437,
+              "input_tokens": 1407,
+              "output_tokens": 145
+            },
+            {
+              "task": "Choose bounded interventions that discriminate between evidence-supported hypotheses, using the intervention descriptions in the schema. Prefer a reviewed application change that tests the proposed mechanism; repeat_baseline measures repeatability only and cannot test causality. No arbitrary code or commands. Never plan an experiment for an unknown cause; return an empty experiments list when all causes are unknown.",
+              "model": "Qwen/Qwen3-235B-A22B-Instruct-2507:novita",
+              "response_model": "qwen/qwen3-235b-a22b-instruct-2507",
+              "prompt_version": "failurelab-agents-v3",
+              "tool_description_version": "reviewed-interventions-v1",
+              "tool_schema_sha256": "2f64287f9ce6fd7928ec519bedd825b884e36239c3548f4a0a0fcd5cefbefa93",
+              "duration_ms": 2875,
+              "input_tokens": 1528,
+              "output_tokens": 103
+            }
+          ],
+          "provider_errors": [],
+          "error": null,
+          "human_review": "pending",
+          "checkpoint": {
+            "id": "1f1af42c-d95e-6580-8006-44156e265e4f",
+            "next": [],
+            "created_at": "2026-09-13T07:14:47.705126+00:00"
+          },
+          "agent_diagnosis": {
+            "hypotheses": [
+              {
+                "id": "h1",
+                "cause": "api_contract",
+                "title": "API response structure change causes property access failure",
+                "explanation": "The test fails with 'Cannot read properties of undefined (reading 'name')', which aligns with the code expecting 'response.user.name' but the API now returning 'response.data.name' as shown in the diff. The 200 status indicates no network error, so the issue stems from a contract mismatch.",
+                "evidence_ids": [
+                  "e-log",
+                  "e-diff"
+                ],
+                "status": "proposed"
+              }
+            ],
+            "missing_evidence": []
+          },
+          "model_call_attempts": 2
+        },
+        {
+          "scenario": "unknown",
+          "case_id": "inv-0acb00f44bb9",
+          "status": "provider_unavailable",
+          "fixture_commit_label": "a13f8c2e940ba175ad1841b2a76a5ffc56bb1234",
+          "fixture_commit_note": "Synthetic fixture label, not a fetched Git commit; implementation hashes freeze the executable fixture.",
+          "original_failure": "Worker exited with code 137. No browser trace or application logs were retained.",
+          "input_snapshot_sha256": "6c872edd714571ed77652fd075d2dfa3ef01ade3ad46ea72e44745bb9efee244",
+          "evidence_ids": [
+            "e-log",
+            "e-dom",
+            "e-diff",
+            "e-runbook"
+          ],
+          "retrieved_ids": [
+            "e-log",
+            "e-dom",
+            "e-diff",
+            "e-runbook"
+          ],
+          "checks": {
+            "completed": false,
+            "chat_mode": false,
+            "two_live_stages": false,
+            "expected_cause": false,
+            "expected_outcome": false,
+            "missing_evidence_reported": false,
+            "browser_evidence_or_abstention": true
+          },
+          "passed": false,
+          "metrics": {},
+          "observed_causes": [],
+          "observed_experiments": [],
+          "artifact_sha256": {},
+          "diagnosis": [],
+          "plan": [],
+          "experiments": [],
+          "model_usage": [],
+          "provider_errors": [
+            {
+              "category": "provider_unavailable",
+              "http_status": 402,
+              "transport_error": null,
+              "duration_ms": 316
+            }
+          ],
+          "error": "Model provider returned HTTP 402; no baseline substitution was made",
+          "human_review": "pending",
+          "checkpoint": {
+            "id": "1f1af42c-dc66-67c3-8002-8899ddb76bc2",
+            "next": [
+              "diagnose"
+            ],
+            "created_at": "2026-09-13T07:14:48.023033+00:00"
+          },
+          "agent_diagnosis": null,
+          "model_call_attempts": 1
+        }
+      ],
+      "passed": false,
+      "acceptance_id": "d49383dbe2834c31b5f39c0d3d68bb05"
+    }
+  ],
+  "unfamiliar_replay": {
+    "case_id": "inv-bc1e08adab69",
+    "replays": 3,
+    "additional_model_calls": 0,
+    "additional_actions_jobs": 0,
+    "case_and_events_unchanged": true,
+    "artifact_sha256": {
+      "runner-cafdd74050b063d0d409a2d3c6a01c262416dcae4c095cba32a65224b53b441b.png": "cafdd74050b063d0d409a2d3c6a01c262416dcae4c095cba32a65224b53b441b",
+      "runner-43961ed64b69d0cdd85c3942bfabf0295a342a96558cf50c0a7db4ee0520e5d4.zip": "43961ed64b69d0cdd85c3942bfabf0295a342a96558cf50c0a7db4ee0520e5d4",
+      "runner-af1480166869ffe9aeae6fbb84c48b98c379a94cff650262b0f584b501661a31.png": "af1480166869ffe9aeae6fbb84c48b98c379a94cff650262b0f584b501661a31",
+      "runner-b6a60e095295dabe1e97a4cd82050c6ef3ce8f36d0079f64d0699fb40b7ee848.zip": "b6a60e095295dabe1e97a4cd82050c6ef3ce8f36d0079f64d0699fb40b7ee848"
+    },
+    "trace_crc_checks": "passed",
+    "ground_truth_sha256": "f9cd9a45def45c5c3f456b553cee57cbaabc400688f49696585ad9874d0782ce",
+    "human_reviews": [],
+    "outcome": "supported",
+    "evidence_ids": [
+      "e-run",
+      "e-job-103622314972",
+      "e-code-0",
+      "e-artifact-10305483759-0",
+      "e-artifact-10305483759-1-1",
+      "e-artifact-10305483759-1-2",
+      "e-artifact-10305483759-1-3",
+      "e-artifact-10305483759-2"
+    ]
+  },
+  "local_webhook": {
+    "scope": "Local HTTP replay using actual GitHub run metadata; not a GitHub-delivered webhook",
+    "unsigned_status": 401,
+    "tampered_status": 401,
+    "signed_status": 200,
+    "duplicate_created": false,
+    "case_id": "inv-d4d25f2705e7"
+  },
+  "provider_diagnostic_requests": [
+    {
+      "at": "2026-09-13T07:06:16.202348+00:00",
+      "provider": "https://router.huggingface.co/v1",
+      "model": "Qwen/Qwen3-235B-A22B-Instruct-2507:novita",
+      "mode": "chat",
+      "vision": false,
+      "key_present": true,
+      "environment_overrides": [],
+      "organization_billing_header_sent": false,
+      "authentication_http": 200,
+      "models_http": 200,
+      "model_listed": true,
+      "inference_http": 200,
+      "latency_ms": 817,
+      "usage": {
+        "prompt_tokens": 21,
+        "completion_tokens": 8,
+        "total_tokens": 29,
+        "prompt_tokens_details": null,
+        "completion_tokens_details": null
+      },
+      "response_model": "qwen/qwen3-235b-a22b-instruct-2507"
+    },
+    {
+      "at": "2026-09-13T07:12:15.639792+00:00",
+      "status": 200,
+      "usage": {
+        "prompt_tokens": 18,
+        "completion_tokens": 5,
+        "total_tokens": 23,
+        "prompt_tokens_details": null,
+        "completion_tokens_details": null
+      }
+    },
+    {
+      "at": "2026-09-13T07:13:02.131802+00:00",
+      "scope": "One diagnostic reproduction of rejected planning request; not accepted as the case result or a regression pass",
+      "http_status": 200,
+      "usage": {
+        "prompt_tokens": 1555,
+        "completion_tokens": 100,
+        "total_tokens": 1655,
+        "prompt_tokens_details": null,
+        "completion_tokens_details": null
+      },
+      "response_model": "qwen/qwen3-235b-a22b-instruct-2507"
+    }
+  ],
+  "human_review": "pending"
+}

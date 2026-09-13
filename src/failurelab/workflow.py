@@ -6,7 +6,14 @@ from typing import TypedDict
 
 from langgraph.graph import END, START, StateGraph
 
-from failurelab.agents import PROMPT_VERSION, Agents
+from failurelab.agents import (
+    PROMPT_VERSION,
+    TOOL_DESCRIPTION_VERSION,
+    TOOL_SCHEMA_SHA256,
+    AgentOutputError,
+    Agents,
+    ProviderUnavailable,
+)
 from failurelab.integrations import GitHub
 from failurelab.retrieval import RETRIEVAL_VERSION, retrieve
 from failurelab.runner import run_experiment, screenshot
@@ -42,6 +49,8 @@ class Investigator:
             "embedding": self.settings.embedding_model,
             "reranker": self.settings.reranker_model,
             "prompt": PROMPT_VERSION,
+            "tool_description_version": TOOL_DESCRIPTION_VERSION,
+            "tool_schema_sha256": TOOL_SCHEMA_SHA256,
             "retrieval_version": RETRIEVAL_VERSION,
         }
 
@@ -247,15 +256,24 @@ class Investigator:
             graph = self.graph(saver)
             config = {"configurable": {"thread_id": case_id}, "recursion_limit": 20}
             state = graph.get_state(config)
-            if (
-                state.values
-                and state.next
-                and state.values.get("runtime", self.runtime()) != self.runtime()
-            ):
+            case = self.store.get(case_id)
+            if case is None:
+                raise RuntimeError("Investigation does not exist")
+            if case["result"] and not state.values:
+                raise RuntimeError(
+                    "Completed investigation checkpoint is missing; restore the recorded checkpoint before replay"
+                )
+            if state.values and state.values.get("case_id") != case_id:
+                raise RuntimeError("Checkpoint investigation identity is invalid")
+            if state.values and state.next and state.values.get("runtime") != self.runtime():
                 raise RuntimeError(
                     "Inference or retrieval configuration changed since this checkpoint. Start a new run to preserve version provenance."
                 )
             if state.values and not state.next and state.values.get("report"):
+                if case["result"] and case["result"] != state.values["report"]:
+                    raise RuntimeError("Completed checkpoint differs from the preserved report")
+                if case["status"] == "completed" and case["result"]:
+                    return
                 result = state.values
             else:
                 result = graph.invoke(
@@ -294,6 +312,19 @@ class Worker:
         except Exception as exc:
             # Do not log raw provider errors, request objects, credentials, or repository content.
             logger.error("investigation_failed id=%s type=%s", case_id, type(exc).__name__)
+            category = (
+                "provider_unavailable"
+                if isinstance(exc, ProviderUnavailable)
+                else "agent_failed"
+                if isinstance(exc, AgentOutputError)
+                else "execution_failed"
+            )
+            self.store.event(
+                case_id,
+                "failure_category",
+                "Investigation failure classified.",
+                {"category": category},
+            )
             safe = (
                 str(exc)
                 if isinstance(exc, RuntimeError)

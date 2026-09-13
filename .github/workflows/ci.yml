@@ -43,6 +43,7 @@ jobs:
         working-directory: frontend
       - run: uv run ruff check src tests scripts
       - run: uv run ruff format --check src tests scripts
+      - run: uv run mypy src/failurelab
       - run: uv run pytest --cov=failurelab --cov-report=xml --junitxml=var/test-results.xml
       - run: uv run failurelab evaluate --min-accuracy 0.8
       - name: Preserve verification artifacts

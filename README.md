@@ -74,6 +74,9 @@ The [unfamiliar CI validation](docs/unfamiliar-ci-validation.md) follows a separ
 authored GitHub incident through live diagnosis, planning, and a real Linux browser
 experiment. It records unsuccessful attempts as well as the supported result.
 
+The [v0.1.2 release check](docs/releases/v0.1.2-gate.md) records current regression,
+replay, and provider status. Version preparation does not indicate a published release.
+
 Copy `.env.example` to `.env` to configure integrations. Empty optional values use
 their documented defaults. Secrets remain server-side and `.env` is Git-ignored.
 
