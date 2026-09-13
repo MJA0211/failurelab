@@ -4,6 +4,7 @@ The API server does not import this module. A single runner handles one experime
 the VM must be destroyed between untrusted repositories. See docs/runner-protocol.md.
 """
 
+import base64
 import hashlib
 import json
 import os
@@ -20,7 +21,60 @@ from fastapi import FastAPI, Header, HTTPException
 from pydantic import Field
 
 from failurelab.runner import verdict
-from failurelab.schemas import ExperimentPlan, ExperimentResult, StrictModel
+from failurelab.schemas import ExperimentPlan, RunnerArtifact, RunnerResponse, StrictModel
+
+MAX_CAPTURE_BYTES = 6_000_000
+
+
+def capture_artifacts(report, output_dir, prefix):
+    """Retain bounded PNG/trace attachments before the disposable checkout is removed."""
+    payloads = []
+    total = 0
+    if any(p.is_symlink() for p in [output_dir, *output_dir.parents]):
+        raise ValueError("Runner output directory must not contain symlinks")
+    root = output_dir.resolve()
+
+    def visit(value):
+        nonlocal total
+        if isinstance(value, dict):
+            for attachment in value.get("attachments", []):
+                if not isinstance(attachment, dict) or not attachment.get("path"):
+                    continue
+                path = Path(attachment["path"])
+                if path.suffix.lower() not in {".png", ".zip"}:
+                    continue
+                if not path.is_absolute():
+                    raise ValueError("Runner attachment path must be absolute")
+                # Refuse links at every level, including links into an otherwise valid root.
+                if not path.resolve().is_relative_to(root) or any(
+                    p.is_symlink() for p in [path, *path.parents]
+                ):
+                    raise ValueError("Runner attachment escaped the output directory")
+                size = path.stat().st_size
+                if not path.is_file() or size > MAX_CAPTURE_BYTES - total or len(payloads) >= 8:
+                    raise ValueError("Runner artifact capture limit exceeded")
+                data = path.read_bytes()
+                if len(data) != size or not data.startswith(
+                    b"\x89PNG\r\n\x1a\n" if path.suffix.lower() == ".png" else b"PK\x03\x04"
+                ):
+                    raise ValueError("Runner attachment has invalid content")
+                total += size
+                payloads.append(
+                    RunnerArtifact(
+                        name=f"{prefix}-{len(payloads)}{path.suffix.lower()}",
+                        sha256=hashlib.sha256(data).hexdigest(),
+                        data_base64=base64.b64encode(data).decode("ascii"),
+                    )
+                )
+            for key, child in value.items():
+                if key != "attachments":
+                    visit(child)
+        elif isinstance(value, list):
+            for child in value:
+                visit(child)
+
+    visit(json.loads(report))
+    return payloads
 
 
 class RunnerRequest(StrictModel):
@@ -162,10 +216,12 @@ def execute(request: RunnerRequest, manifest_digest: str):
         if not cli.is_file():
             raise RuntimeError("Repository must declare @playwright/test in its lockfile")
         observations, expected_tests = [], None
+        artifacts = []
         counts = {"baseline": 0, "intervention": 0}
         for repetition in range(request.plan.repetitions):
             for condition in ("baseline", "intervention"):
                 run_env = {**env, **(intervention_env if condition == "intervention" else {})}
+                output_dir = root / ".failurelab-output" / f"{condition}-{repetition}"
                 _, output = command(
                     [
                         "node",
@@ -175,12 +231,20 @@ def execute(request: RunnerRequest, manifest_digest: str):
                         "--retries=0",
                         "--workers=1",
                         "--reporter=json",
+                        "--trace=on",
+                        "--output=" + str(output_dir),
                     ],
                     root,
                     run_env,
                     30,
                 )
                 passed, tests = parse_test_result(output)
+                if repetition == 0:
+                    artifacts.extend(
+                        capture_artifacts(
+                            output, output_dir, f"{request.plan.hypothesis_id}-{condition}"
+                        )
+                    )
                 if expected_tests is None:
                     expected_tests = tests
                 if tests != expected_tests:
@@ -189,7 +253,9 @@ def execute(request: RunnerRequest, manifest_digest: str):
                 observations.append(
                     f"{condition} {repetition + 1}: {'PASS' if passed else 'FAIL'}; {len(tests)} unchanged assertions"
                 )
-        return ExperimentResult(
+        if sum(len(a.data_base64) for a in artifacts) > 8_000_000:
+            raise ValueError("Combined runner artifacts exceeded the transfer limit")
+        return RunnerResponse(
             hypothesis_id=request.plan.hypothesis_id,
             intervention=request.plan.intervention,
             baseline_passes=counts["baseline"],
@@ -203,6 +269,8 @@ def execute(request: RunnerRequest, manifest_digest: str):
             ),
             duration_ms=int((time.perf_counter() - start) * 1000),
             observations=observations,
+            artifacts=[a.name for a in artifacts],
+            artifact_payloads=artifacts,
             environment={
                 "runner": "isolated-repository-runner-v1",
                 "commit_sha": sha.strip(),
@@ -247,7 +315,7 @@ def create_runner_app():
             raise HTTPException(429, "Runner is busy")
         try:
             if path.exists():
-                return ExperimentResult.model_validate_json(path.read_text(encoding="utf-8"))
+                return RunnerResponse.model_validate_json(path.read_text(encoding="utf-8"))
             try:
                 result = execute(request, digest)
             except (RuntimeError, ValueError, OSError) as exc:

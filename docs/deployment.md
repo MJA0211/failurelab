@@ -23,6 +23,10 @@ Chromium startup, and the full test suite in your container host before release.
 The application container is for orchestration and owned fixtures. It is not a sandbox
 for arbitrary repositories. The repository runner needs a separate disposable Linux VM.
 
+The [single-incident validation](unfamiliar-ci-validation.md) exercised the runner on
+a disposable GitHub-hosted Linux VM with an owned repository. That acceptance does
+not validate the container deployment or a permanent private runner endpoint.
+
 ## Separate workers and PostgreSQL
 
 Install `uv sync --extra dev --extra postgres`. Configure:
@@ -61,6 +65,12 @@ No automatic deletion runs. Establish a retention policy appropriate to reposito
 permissions and team needs; exported reports must follow the same policy.
 
 ## Failure recovery
+
+Completed replay preserves the stored report and timestamp. A missing completed
+checkpoint, a different checkpoint report, or the wrong investigation identity
+stops replay. Restore a consistent backup before retrying corrupted state. Pending
+checkpoints also compare the tool-schema hash; changed contracts require a new
+investigation. See the [release check](releases/v0.1.2-gate.md) for exercised cases.
 
 - **Provider failure:** case becomes failed with a sanitized error. Fix configuration
   and use Retry from checkpoint. No baseline substitution occurs.

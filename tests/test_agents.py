@@ -161,3 +161,45 @@ def test_evaluation_is_measured_and_labeled(settings):
     assert "not a held-out" in report["limitations"][0]
     assert (settings.data_dir / "evaluation.json").exists()
     assert wilson(16, 16)[0] < 1
+
+
+@respx.mock
+def test_live_planner_receives_tool_effects_without_case_specific_solution(settings):
+    evidence = fixture("api_contract")["evidence"]
+    diagnosis = baseline_diagnosis(evidence)
+
+    def provider(request):
+        payload = json.loads(request.content)
+        instructions = json.loads(payload["messages"][1]["content"][0]["text"])
+        description = instructions["schema"]["$defs"]["ExperimentPlan"]["properties"][
+            "intervention"
+        ]["description"]
+        assert "repeat_baseline changes nothing" in description
+        assert "restore_response restores the API response contract" in description
+        assert "cents" not in description and "162.40" not in description
+        return httpx.Response(
+            200,
+            json={
+                "choices": [
+                    {
+                        "message": {
+                            "content": json.dumps(
+                                {
+                                    "experiments": [
+                                        {
+                                            "hypothesis_id": "h1",
+                                            "intervention": "restore_response",
+                                            "rationale": "Compare the reviewed response contract against the failing run.",
+                                        }
+                                    ]
+                                }
+                            )
+                        }
+                    }
+                ]
+            },
+        )
+
+    respx.post("https://models.example/v1/chat/completions").mock(side_effect=provider)
+    plan = Agents(chat_settings(settings)).plan(diagnosis, evidence)
+    assert plan.experiments[0].intervention == "restore_response"

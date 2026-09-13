@@ -77,14 +77,26 @@ CLI without a shell. Child processes do not receive runner credentials. Timeouts
 the whole process group, including surviving web servers. Each condition uses fresh
 Playwright processes; the repository harness must reset any disk/database state.
 
-Responses use the ExperimentResult schema in `/openapi.json`: pass counts, repetitions,
-observations, duration, and environment hashes. The orchestrator validates counts and
-recomputes verdicts. HTTP 401 rejects authentication, 403 rejects unreviewed repositories,
+Responses serialize `RunnerResponse`, which extends `ExperimentResult` with optional
+`artifact_payloads`: a bounded PNG/ZIP name, SHA-256, and base64 bytes. The runner
+captures attachments from the first baseline/intervention pair before removing the
+checkout. It rejects symlink traversal and paths outside the output directory,
+limits each capture to 6,000,000 bytes, and limits combined base64 content to
+8,000,000 characters. At most 16 payloads are returned.
+
+The orchestrator caps responses at the smaller of 16,000,000 bytes and twice
+`max_artifact_bytes`. It validates declarations, decoded size, content signatures,
+and hashes before saving bytes under content-addressed names. Raw payloads do not
+enter the final report. Pass counts, repetitions, observations, duration, and
+environment hashes remain in `ExperimentResult`; the orchestrator recomputes verdicts.
+HTTP 401 rejects authentication, 403 rejects unreviewed repositories,
 429 indicates a busy runner, and 422 indicates a failed reproduction contract.
 
 Result caching uses the idempotency key plus request digest. The cache lives inside
 the runner VM unless an isolated result store is provisioned. No repository code is
 permitted to access shared orchestrator artifacts or credentials.
 
-Protocol/parser/manifest tests run locally. An actual Linux VM repository execution
-has not been performed in the Windows implementation environment.
+Protocol/parser/manifest tests run locally. The [single-incident acceptance](unfamiliar-ci-validation.md)
+also exercised this service through real HTTP on a disposable GitHub-hosted Linux VM,
+using a reviewed owned repository. It does not validate a permanent private endpoint
+or a general untrusted-repository deployment.

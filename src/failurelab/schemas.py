@@ -37,7 +37,15 @@ class Diagnosis(StrictModel):
 
 class ExperimentPlan(StrictModel):
     hypothesis_id: str = Field(pattern=r"^h[1-3]$")
-    intervention: Intervention
+    intervention: Intervention = Field(
+        description=(
+            "Choose an operator-reviewed application intervention: remove_overlay removes an "
+            "obstructing UI layer; restore_selector restores the locator/DOM contract; "
+            "restore_response restores the API response contract. repeat_baseline changes "
+            "nothing and measures repeatability only; it cannot discriminate a proposed "
+            "mechanism or support a causal finding. Availability is checked by the runner."
+        )
+    )
     rationale: str = Field(min_length=1, max_length=1000)
     repetitions: int = Field(default=3, ge=2, le=5)
 
@@ -57,6 +65,16 @@ class ExperimentResult(StrictModel):
     observations: list[str]
     artifacts: list[str] = Field(default_factory=list)
     environment: dict = Field(default_factory=dict)
+
+
+class RunnerArtifact(StrictModel):
+    name: str = Field(pattern=r"^[A-Za-z0-9_-]{1,100}\.(?:png|zip)$")
+    sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+    data_base64: str = Field(max_length=8_000_000)
+
+
+class RunnerResponse(ExperimentResult):
+    artifact_payloads: list[RunnerArtifact] = Field(default_factory=list, max_length=16)
 
 
 class InvestigationInput(StrictModel):

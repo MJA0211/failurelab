@@ -1,0 +1,42 @@
+{
+  "incident_id": "invoice-units-001",
+  "classification": "authored external-style validation; not independent",
+  "repository": "MJA0211/failurelab-ci-validation",
+  "commit_sha": "92b61b0eb9a55a73886394979d66cc158f3a99e8",
+  "failing_run_id": 34719385585,
+  "reference_run_id": 34719386780,
+  "workflow": "Invoice browser CI",
+  "job": "invoice",
+  "test_name": "invoice displays the agreed total",
+  "symptom": "Expected $162.40; displayed $16,240.00",
+  "root_cause": "src/api.js serializes amount_cents as price; src/app.js treats price as major currency units, so the invoice total is multiplied by 100.",
+  "expected_cause_category": "api_contract",
+  "relevant_files": [
+    "src/api.js",
+    "src/app.js",
+    "tests/invoice.spec.js"
+  ],
+  "verification": "Identical browser assertion fails at baseline and passes when the response-boundary harness converts price from minor to major units.",
+  "expected_intervention": "restore_response",
+  "expected_baseline_passes": 0,
+  "expected_intervention_passes": "all repetitions",
+  "expected_verdict": "supported",
+  "manifest_sha256": "3a3a95010b05ad72f9f494e076f0d61404f254b82315247292dd5c193091badf",
+  "source_hashes": {
+    "src/api.js": "9c40e1ce7abe8f831423a700dff7b151cfb85b8cbe42328d98e12a6122d019cb",
+    "src/app.js": "0f5ae5b7fdd134efb09100634a1359d1906010e263f2ae3d36abcfa216950574",
+    "tests/invoice.spec.js": "526e2c5f854c14f7131dee753bee66a0ecf9d3357bb460a1f6500f42f66d0ae1",
+    "server.js": "5a9ff8bb58539b3610253a74c3515ef2ebdeb783731619dac10bf0f6ca9ac03d",
+    "package-lock.json": "28070f94663b866c8fd5d0aa88e1a21e9c3a632881c8b9d2b72481cbb89cc586"
+  },
+  "license": "MIT (owned code); @playwright/test is Apache-2.0",
+  "provenance": "Authored for this validation; no third-party application code copied. Public issue medusajs/medusa#14818 was reviewed but has no linked reproduction repository/pinned failing CI suitable for this acceptance. Its code and diagnosis are not model inputs.",
+  "excluded_from_model": [
+    "this ground-truth record",
+    "server.js repair harness",
+    ".failurelab/runner.json",
+    "reference workflow logs/artifacts",
+    "fixing changes or explanations"
+  ],
+  "frozen_at": "2026-09-12T21:15:00.994584+00:00"
+}

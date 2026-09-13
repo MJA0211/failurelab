@@ -3,11 +3,13 @@ import json
 import logging
 import signal
 
+from failurelab import __version__
 from failurelab.config import Settings
 
 
 def main():
     parser = argparse.ArgumentParser(prog="failurelab")
+    parser.add_argument("--version", action="version", version=f"FailureLab {__version__}")
     sub = parser.add_subparsers(dest="command", required=True)
     serve = sub.add_parser("serve", help="Serve the API, built UI, and local worker")
     serve.add_argument("--host")

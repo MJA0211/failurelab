@@ -1,0 +1,986 @@
+{
+  "classification": "Authored single-incident development validation; not independent or held out",
+  "ground_truth_sha256": "f9cd9a45def45c5c3f456b553cee57cbaabc400688f49696585ad9874d0782ce",
+  "model_input_snapshot_sha256": "877a0199101d5ccfd2ddf831d0639ff0b6dfe153f8b0299eec3eeaa5877e8b5d",
+  "evidence_manifest": [
+    {
+      "id": "e-run",
+      "title": "Workflow metadata",
+      "kind": "metadata",
+      "source": "https://github.com/MJA0211/failurelab-ci-validation/actions/runs/34719385585",
+      "sha": "129392c471c0910194cb2a56c3240e8529dbcac4b69fadf0a5fd3f9c4858cf41"
+    },
+    {
+      "id": "e-job-103622314972",
+      "title": "invoice",
+      "kind": "log",
+      "source": "https://github.com/MJA0211/failurelab-ci-validation/actions/runs/34719385585/job/103622314972",
+      "sha": "854e787436c63ea9be8e93e69556d0068c09ced702b27ea1529f3a665c80cbe1"
+    },
+    {
+      "id": "e-code-0",
+      "title": "src/app.js",
+      "kind": "code",
+      "source": "https://github.com/mja0211/failurelab-ci-validation/blob/92b61b0eb9a55a73886394979d66cc158f3a99e8/src/app.js",
+      "sha": "ba7d75f35377132ca2ef97b5adc3d15c15e990d3ab1f2fed7b04f471e9ae2e2f"
+    },
+    {
+      "id": "e-artifact-10305483759-0",
+      "title": "00-source.txt",
+      "kind": "document",
+      "source": "github-artifact://00-source.txt",
+      "sha": "0c7607ff61ce6f9d22f51d3433c1bafe8999c2a1f5fd446cb8078f1608e3f0a2"
+    },
+    {
+      "id": "e-artifact-10305483759-1-1",
+      "title": "test.trace",
+      "kind": "log",
+      "source": "github-trace://test.trace",
+      "sha": "cfe7aaec2a20c04da30ac3930575b90fd8b6688ec62fe08048f1ab575b298584"
+    },
+    {
+      "id": "e-artifact-10305483759-1-2",
+      "title": "0-trace.trace",
+      "kind": "log",
+      "source": "github-trace://0-trace.trace",
+      "sha": "071e1782e7511b997e1396c8f9ddca882beb35c780fe60fd70c6a4b3d3bac8a7"
+    },
+    {
+      "id": "e-artifact-10305483759-1-3",
+      "title": "0-trace.network",
+      "kind": "log",
+      "source": "github-trace://0-trace.network",
+      "sha": "a67a3d88af1d012fb6086d9c2516334b53ff1d04a24af8e06c8b33a8831c5ed3"
+    },
+    {
+      "id": "e-artifact-10305483759-2",
+      "title": "browser.png",
+      "kind": "image",
+      "source": "github-artifact://browser.png",
+      "sha": "cafdd74050b063d0d409a2d3c6a01c262416dcae4c095cba32a65224b53b441b"
+    }
+  ],
+  "retrieved_ids": [
+    "e-artifact-10305483759-1-1",
+    "e-job-103622314972",
+    "e-artifact-10305483759-1-3",
+    "e-artifact-10305483759-1-2",
+    "e-code-0",
+    "e-artifact-10305483759-0",
+    "e-run",
+    "e-artifact-10305483759-2"
+  ],
+  "comparison_modes": [
+    {
+      "mode": "deterministic",
+      "diagnosis": {
+        "hypotheses": [
+          {
+            "id": "h1",
+            "cause": "unknown",
+            "title": "Insufficient evidence to localize this failure",
+            "explanation": "The retained evidence does not establish a specific cause. Obtain the failing trace, source diff, and environment details before drawing a conclusion.",
+            "evidence_ids": [
+              "e-run"
+            ],
+            "status": "proposed"
+          }
+        ],
+        "missing_evidence": [
+          "A reproducible failure with browser trace and source at the failing commit"
+        ]
+      },
+      "usage": [],
+      "duration_ms": 4,
+      "evidence_ids": [
+        "e-run",
+        "e-job-103622314972",
+        "e-code-0",
+        "e-artifact-10305483759-0",
+        "e-artifact-10305483759-1-1",
+        "e-artifact-10305483759-1-2",
+        "e-artifact-10305483759-1-3",
+        "e-artifact-10305483759-2"
+      ]
+    },
+    {
+      "mode": "llm_logs",
+      "diagnosis": {
+        "hypotheses": [
+          {
+            "id": "h1",
+            "cause": "api_contract",
+            "title": "API response total does not match expected format in test",
+            "explanation": "The test expects the total amount to be '$162.40' but the actual rendered value is '$16,240.00'. The trace shows the API response contains line items with prices in cents (7495, 1250), which sum to 16240 cents or $162.40. However, the frontend appears to render this as $16,240.00, suggesting a contract mismatch: the test and frontend disagree on whether amounts are in dollars or cents, or the formatting logic incorrectly applies grouping.",
+            "evidence_ids": [
+              "e-job-103622314972",
+              "e-artifact-10305483759-1-1",
+              "e-artifact-10305483759-1-2"
+            ],
+            "status": "proposed"
+          }
+        ],
+        "missing_evidence": []
+      },
+      "usage": [
+        {
+          "task": "Propose at most three causes supported by incident-specific observations, ordered by evidence strength. If none is supported, return one unknown hypothesis. Use status=proposed.",
+          "model": "Qwen/Qwen3-235B-A22B-Instruct-2507:novita",
+          "duration_ms": 13354,
+          "input_tokens": 45623,
+          "output_tokens": 256
+        }
+      ],
+      "duration_ms": 13356,
+      "evidence_ids": [
+        "e-job-103622314972",
+        "e-artifact-10305483759-1-1",
+        "e-artifact-10305483759-1-2",
+        "e-artifact-10305483759-1-3"
+      ]
+    },
+    {
+      "mode": "llm_retrieval",
+      "diagnosis": {
+        "hypotheses": [
+          {
+            "id": "h1",
+            "cause": "api_contract",
+            "title": "API response contains price in cents, but frontend expects dollars",
+            "explanation": "The test fails because the total displayed is '$16,240.00' instead of the expected '$162.40'. The trace log shows the API returns line items with 'price':7495 and 'price':1250, which match the source code where 'amount_cents' is used directly. The frontend uses Intl.NumberFormat without converting from cents to dollars, resulting in a 100x inflation of the displayed total.",
+            "evidence_ids": [
+              "e-artifact-10305483759-1-1",
+              "e-artifact-10305483759-1-3",
+              "e-code-0",
+              "e-artifact-10305483759-0"
+            ],
+            "status": "proposed"
+          }
+        ],
+        "missing_evidence": []
+      },
+      "usage": [
+        {
+          "task": "Propose at most three causes supported by incident-specific observations, ordered by evidence strength. If none is supported, return one unknown hypothesis. Use status=proposed.",
+          "model": "Qwen/Qwen3-235B-A22B-Instruct-2507:novita",
+          "duration_ms": 11518,
+          "input_tokens": 46820,
+          "output_tokens": 241
+        }
+      ],
+      "duration_ms": 11519,
+      "evidence_ids": [
+        "e-artifact-10305483759-1-1",
+        "e-job-103622314972",
+        "e-artifact-10305483759-1-3",
+        "e-artifact-10305483759-1-2",
+        "e-code-0",
+        "e-artifact-10305483759-0",
+        "e-run",
+        "e-artifact-10305483759-2"
+      ]
+    }
+  ],
+  "full_attempts": [
+    {
+      "attempt": 1,
+      "case_id": "inv-b423682876bc",
+      "versions": {
+        "model": "Qwen/Qwen3-235B-A22B-Instruct-2507:novita",
+        "mode": "chat",
+        "prompt": "failurelab-agents-v2",
+        "retrieval": "retrieval-v1",
+        "retrieval_mode": "lexical"
+      },
+      "hypotheses": [
+        {
+          "id": "h1",
+          "cause": "api_contract",
+          "title": "Currency formatting mismatch due to missing thousand separators in expected value",
+          "explanation": "The test expects the total to be '$162.40' but the actual value is '$16,240.00'. The observed invoice response shows a total of 16240 cents (162.40 USD). The application uses Intl.NumberFormat which formats large numbers with thousand separators. The test's expected value does not account for this formatting, leading to a mismatch when the actual formatted value includes thousand separators.",
+          "evidence_ids": [
+            "e-artifact-10305483759-1-1",
+            "e-artifact-10305483759-1-2",
+            "e-artifact-10305483759-1-3",
+            "e-code-0",
+            "e-artifact-10305483759-0"
+          ],
+          "status": "inconclusive"
+        }
+      ],
+      "experiments": [
+        {
+          "hypothesis_id": "h1",
+          "intervention": "repeat_baseline",
+          "baseline_passes": 0,
+          "intervention_passes": 0,
+          "repetitions": 3,
+          "verdict": "inconclusive",
+          "duration_ms": 24618,
+          "observations": [
+            "baseline 1: FAIL; 1 unchanged assertions",
+            "intervention 1: FAIL; 1 unchanged assertions",
+            "baseline 2: FAIL; 1 unchanged assertions",
+            "intervention 2: FAIL; 1 unchanged assertions",
+            "baseline 3: FAIL; 1 unchanged assertions",
+            "intervention 3: FAIL; 1 unchanged assertions"
+          ],
+          "artifacts": [
+            "runner-cafdd74050b063d0d409a2d3c6a01c262416dcae4c095cba32a65224b53b441b.png",
+            "runner-4c4e1ff33f154cc2b7edae3a842f3beb704b1119485e2e3253a2b5521a7e8f98.zip",
+            "runner-cafdd74050b063d0d409a2d3c6a01c262416dcae4c095cba32a65224b53b441b.png",
+            "runner-0bd6db34ef9fcd6209883a9d194e27e3533a66e8f7060e0fee118ec9d676d6d0.zip"
+          ],
+          "environment": {
+            "runner": "isolated-repository-runner-v1",
+            "commit_sha": "92b61b0eb9a55a73886394979d66cc158f3a99e8",
+            "manifest_sha256": "3a3a95010b05ad72f9f494e076f0d61404f254b82315247292dd5c193091badf",
+            "lockfile_sha256": "28070f94663b866c8fd5d0aa88e1a21e9c3a632881c8b9d2b72481cbb89cc586",
+            "acceptance_workflow_url": "https://github.com/MJA0211/failurelab-ci-validation/actions/runs/34719792686",
+            "transport": "GitHub Actions dispatch and artifact return; live runner HTTP executed inside VM",
+            "artifact_sha256": {
+              "runner-cafdd74050b063d0d409a2d3c6a01c262416dcae4c095cba32a65224b53b441b.png": "cafdd74050b063d0d409a2d3c6a01c262416dcae4c095cba32a65224b53b441b",
+              "runner-4c4e1ff33f154cc2b7edae3a842f3beb704b1119485e2e3253a2b5521a7e8f98.zip": "4c4e1ff33f154cc2b7edae3a842f3beb704b1119485e2e3253a2b5521a7e8f98",
+              "runner-0bd6db34ef9fcd6209883a9d194e27e3533a66e8f7060e0fee118ec9d676d6d0.zip": "0bd6db34ef9fcd6209883a9d194e27e3533a66e8f7060e0fee118ec9d676d6d0"
+            }
+          }
+        }
+      ],
+      "metrics": {
+        "duration_ms": 154723,
+        "model_calls": 2,
+        "input_tokens": 93772,
+        "output_tokens": 348,
+        "estimated_model_cost_usd": null
+      },
+      "model_usage": [
+        {
+          "task": "Propose at most three causes supported by incident-specific observations, ordered by evidence strength. If none is supported, return one unknown hypothesis. Use status=proposed.",
+          "model": "Qwen/Qwen3-235B-A22B-Instruct-2507:novita",
+          "duration_ms": 31511,
+          "input_tokens": 46818,
+          "output_tokens": 266
+        },
+        {
+          "task": "Choose bounded interventions that discriminate between evidence-supported hypotheses. No arbitrary code or commands. Never plan an experiment for an unknown cause; return an empty experiments list when all causes are unknown.",
+          "model": "Qwen/Qwen3-235B-A22B-Instruct-2507:novita",
+          "duration_ms": 10150,
+          "input_tokens": 46954,
+          "output_tokens": 82
+        }
+      ],
+      "events": [
+        {
+          "id": 2,
+          "case_id": "inv-b423682876bc",
+          "event_key": "inv-b423682876bc:collected",
+          "at": "2026-09-12T21:21:41.193938+00:00",
+          "stage": "collect",
+          "message": "Preserved 8 evidence items at commit 92b61b0.",
+          "data": {
+            "count": 8
+          }
+        },
+        {
+          "id": 3,
+          "case_id": "inv-b423682876bc",
+          "event_key": "inv-b423682876bc:retrieved",
+          "at": "2026-09-12T21:21:41.277940+00:00",
+          "stage": "retrieve",
+          "message": "Ranked 8 evidence items using lexical retrieval.",
+          "data": {
+            "ids": [
+              "e-artifact-10305483759-1-1",
+              "e-job-103622314972",
+              "e-artifact-10305483759-1-3",
+              "e-artifact-10305483759-1-2",
+              "e-code-0",
+              "e-artifact-10305483759-0",
+              "e-run",
+              "e-artifact-10305483759-2"
+            ],
+            "version": "retrieval-v1"
+          }
+        },
+        {
+          "id": 4,
+          "case_id": "inv-b423682876bc",
+          "event_key": "inv-b423682876bc:39886cc0f4be4ef1bbbfb1598c95de60",
+          "at": "2026-09-12T21:22:17.196119+00:00",
+          "stage": "model_call",
+          "message": "Reserved a model call before dispatch.",
+          "data": {
+            "model": "Qwen/Qwen3-235B-A22B-Instruct-2507:novita",
+            "ordinal": 1,
+            "prompt_version": "failurelab-agents-v2"
+          }
+        },
+        {
+          "id": 5,
+          "case_id": "inv-b423682876bc",
+          "event_key": "inv-b423682876bc:7861305e2647477db45c64ef402422d7",
+          "at": "2026-09-12T21:22:48.707673+00:00",
+          "stage": "model_usage",
+          "message": "Recorded provider-reported usage.",
+          "data": {
+            "task": "Propose at most three causes supported by incident-specific observations, ordered by evidence strength. If none is supported, return one unknown hypothesis. Use status=proposed.",
+            "model": "Qwen/Qwen3-235B-A22B-Instruct-2507:novita",
+            "duration_ms": 31511,
+            "input_tokens": 46818,
+            "output_tokens": 266
+          }
+        },
+        {
+          "id": 6,
+          "case_id": "inv-b423682876bc",
+          "event_key": "inv-b423682876bc:diagnosed",
+          "at": "2026-09-12T21:22:48.738716+00:00",
+          "stage": "diagnose",
+          "message": "Diagnosis agent proposed 1 hypotheses.",
+          "data": {
+            "mode": "chat",
+            "prompt_version": "failurelab-agents-v2"
+          }
+        },
+        {
+          "id": 7,
+          "case_id": "inv-b423682876bc",
+          "event_key": "inv-b423682876bc:fa37fdfd15444f02a297a3b0e0820741",
+          "at": "2026-09-12T21:22:48.767255+00:00",
+          "stage": "model_call",
+          "message": "Reserved a model call before dispatch.",
+          "data": {
+            "model": "Qwen/Qwen3-235B-A22B-Instruct-2507:novita",
+            "ordinal": 2,
+            "prompt_version": "failurelab-agents-v2"
+          }
+        },
+        {
+          "id": 8,
+          "case_id": "inv-b423682876bc",
+          "event_key": "inv-b423682876bc:b22c9ed057d14a4888d5dd3d85dd8c8a",
+          "at": "2026-09-12T21:22:58.917096+00:00",
+          "stage": "model_usage",
+          "message": "Recorded provider-reported usage.",
+          "data": {
+            "task": "Choose bounded interventions that discriminate between evidence-supported hypotheses. No arbitrary code or commands. Never plan an experiment for an unknown cause; return an empty experiments list when all causes are unknown.",
+            "model": "Qwen/Qwen3-235B-A22B-Instruct-2507:novita",
+            "duration_ms": 10150,
+            "input_tokens": 46954,
+            "output_tokens": 82
+          }
+        },
+        {
+          "id": 9,
+          "case_id": "inv-b423682876bc",
+          "event_key": "inv-b423682876bc:planned",
+          "at": "2026-09-12T21:22:58.943629+00:00",
+          "stage": "plan",
+          "message": "Experiment agent selected 1 bounded interventions.",
+          "data": {
+            "plans": [
+              {
+                "hypothesis_id": "h1",
+                "intervention": "repeat_baseline",
+                "rationale": "The hypothesis identifies a currency formatting mismatch due to thousand separators. Repeating the baseline test will confirm if the observed formatting behavior is consistent and not due to transient conditions.",
+                "repetitions": 3
+              }
+            ]
+          }
+        },
+        {
+          "id": 10,
+          "case_id": "inv-b423682876bc",
+          "event_key": "inv-b423682876bc:experiment:h1:repeat_baseline",
+          "at": "2026-09-12T21:24:13.626496+00:00",
+          "stage": "experiment",
+          "message": "repeat_baseline: inconclusive (0/3 baseline, 0/3 intervention passes).",
+          "data": {
+            "hypothesis_id": "h1",
+            "intervention": "repeat_baseline",
+            "baseline_passes": 0,
+            "intervention_passes": 0,
+            "repetitions": 3,
+            "verdict": "inconclusive",
+            "duration_ms": 24618,
+            "observations": [
+              "baseline 1: FAIL; 1 unchanged assertions",
+              "intervention 1: FAIL; 1 unchanged assertions",
+              "baseline 2: FAIL; 1 unchanged assertions",
+              "intervention 2: FAIL; 1 unchanged assertions",
+              "baseline 3: FAIL; 1 unchanged assertions",
+              "intervention 3: FAIL; 1 unchanged assertions"
+            ],
+            "artifacts": [
+              "runner-cafdd74050b063d0d409a2d3c6a01c262416dcae4c095cba32a65224b53b441b.png",
+              "runner-4c4e1ff33f154cc2b7edae3a842f3beb704b1119485e2e3253a2b5521a7e8f98.zip",
+              "runner-cafdd74050b063d0d409a2d3c6a01c262416dcae4c095cba32a65224b53b441b.png",
+              "runner-0bd6db34ef9fcd6209883a9d194e27e3533a66e8f7060e0fee118ec9d676d6d0.zip"
+            ],
+            "environment": {
+              "runner": "isolated-repository-runner-v1",
+              "commit_sha": "92b61b0eb9a55a73886394979d66cc158f3a99e8",
+              "manifest_sha256": "3a3a95010b05ad72f9f494e076f0d61404f254b82315247292dd5c193091badf",
+              "lockfile_sha256": "28070f94663b866c8fd5d0aa88e1a21e9c3a632881c8b9d2b72481cbb89cc586",
+              "acceptance_workflow_url": "https://github.com/MJA0211/failurelab-ci-validation/actions/runs/34719792686",
+              "transport": "GitHub Actions dispatch and artifact return; live runner HTTP executed inside VM",
+              "artifact_sha256": {
+                "runner-cafdd74050b063d0d409a2d3c6a01c262416dcae4c095cba32a65224b53b441b.png": "cafdd74050b063d0d409a2d3c6a01c262416dcae4c095cba32a65224b53b441b",
+                "runner-4c4e1ff33f154cc2b7edae3a842f3beb704b1119485e2e3253a2b5521a7e8f98.zip": "4c4e1ff33f154cc2b7edae3a842f3beb704b1119485e2e3253a2b5521a7e8f98",
+                "runner-0bd6db34ef9fcd6209883a9d194e27e3533a66e8f7060e0fee118ec9d676d6d0.zip": "0bd6db34ef9fcd6209883a9d194e27e3533a66e8f7060e0fee118ec9d676d6d0"
+              }
+            }
+          }
+        },
+        {
+          "id": 11,
+          "case_id": "inv-b423682876bc",
+          "event_key": "inv-b423682876bc:reported",
+          "at": "2026-09-12T21:24:13.676582+00:00",
+          "stage": "report",
+          "message": "Investigation report assembled with explicit evidence and uncertainty.",
+          "data": {
+            "outcome": "inconclusive"
+          }
+        }
+      ],
+      "human_reviews": []
+    },
+    {
+      "attempt": 2,
+      "case_id": "inv-46241e95118f",
+      "versions": {
+        "model": "Qwen/Qwen3-235B-A22B-Instruct-2507:novita",
+        "mode": "chat",
+        "prompt": "failurelab-agents-v2",
+        "retrieval": "retrieval-v1",
+        "retrieval_mode": "lexical"
+      },
+      "hypotheses": [
+        {
+          "id": "h1",
+          "cause": "api_contract",
+          "title": "API response contains price in cents, but frontend expects dollars",
+          "explanation": "The test fails because the total displayed is '$16,240.00' instead of the expected '$162.40'. The trace log shows the API returns line items with 'price':7495 and 'price':1250, which match the source code where 'amount_cents' is used directly. The frontend uses Intl.NumberFormat without converting from cents to dollars, resulting in a 100x inflation of the displayed total.",
+          "evidence_ids": [
+            "e-artifact-10305483759-1-1",
+            "e-artifact-10305483759-1-3",
+            "e-code-0",
+            "e-artifact-10305483759-0"
+          ],
+          "status": "inconclusive"
+        }
+      ],
+      "experiments": [
+        {
+          "hypothesis_id": "h1",
+          "intervention": "repeat_baseline",
+          "baseline_passes": 0,
+          "intervention_passes": 0,
+          "repetitions": 3,
+          "verdict": "inconclusive",
+          "duration_ms": 23909,
+          "observations": [
+            "baseline 1: FAIL; 1 unchanged assertions",
+            "intervention 1: FAIL; 1 unchanged assertions",
+            "baseline 2: FAIL; 1 unchanged assertions",
+            "intervention 2: FAIL; 1 unchanged assertions",
+            "baseline 3: FAIL; 1 unchanged assertions",
+            "intervention 3: FAIL; 1 unchanged assertions"
+          ],
+          "artifacts": [
+            "runner-cafdd74050b063d0d409a2d3c6a01c262416dcae4c095cba32a65224b53b441b.png",
+            "runner-c7642b5c8f2e28458751d494f2f3ad55e0dd578ccb61d2026de3d43153d3ed85.zip",
+            "runner-cafdd74050b063d0d409a2d3c6a01c262416dcae4c095cba32a65224b53b441b.png",
+            "runner-2d004996d45afee37e2da445546d7213b50c3c8437cf87484eb4ecceb72839f0.zip"
+          ],
+          "environment": {
+            "runner": "isolated-repository-runner-v1",
+            "commit_sha": "92b61b0eb9a55a73886394979d66cc158f3a99e8",
+            "manifest_sha256": "3a3a95010b05ad72f9f494e076f0d61404f254b82315247292dd5c193091badf",
+            "lockfile_sha256": "28070f94663b866c8fd5d0aa88e1a21e9c3a632881c8b9d2b72481cbb89cc586",
+            "acceptance_workflow_url": "https://github.com/MJA0211/failurelab-ci-validation/actions/runs/34719910740",
+            "transport": "GitHub Actions dispatch and artifact return; live runner HTTP executed inside VM",
+            "artifact_sha256": {
+              "runner-cafdd74050b063d0d409a2d3c6a01c262416dcae4c095cba32a65224b53b441b.png": "cafdd74050b063d0d409a2d3c6a01c262416dcae4c095cba32a65224b53b441b",
+              "runner-c7642b5c8f2e28458751d494f2f3ad55e0dd578ccb61d2026de3d43153d3ed85.zip": "c7642b5c8f2e28458751d494f2f3ad55e0dd578ccb61d2026de3d43153d3ed85",
+              "runner-2d004996d45afee37e2da445546d7213b50c3c8437cf87484eb4ecceb72839f0.zip": "2d004996d45afee37e2da445546d7213b50c3c8437cf87484eb4ecceb72839f0"
+            }
+          }
+        }
+      ],
+      "metrics": {
+        "duration_ms": 86416,
+        "model_calls": 2,
+        "input_tokens": 93758,
+        "output_tokens": 373,
+        "estimated_model_cost_usd": null
+      },
+      "model_usage": [
+        {
+          "task": "Propose at most three causes supported by incident-specific observations, ordered by evidence strength. If none is supported, return one unknown hypothesis. Use status=proposed.",
+          "model": "Qwen/Qwen3-235B-A22B-Instruct-2507:novita",
+          "duration_ms": 5784,
+          "input_tokens": 46820,
+          "output_tokens": 241
+        },
+        {
+          "task": "Choose bounded interventions that discriminate between evidence-supported hypotheses. No arbitrary code or commands. Never plan an experiment for an unknown cause; return an empty experiments list when all causes are unknown.",
+          "model": "Qwen/Qwen3-235B-A22B-Instruct-2507:novita",
+          "duration_ms": 10442,
+          "input_tokens": 46938,
+          "output_tokens": 132
+        }
+      ],
+      "events": [
+        {
+          "id": 13,
+          "case_id": "inv-46241e95118f",
+          "event_key": "inv-46241e95118f:collected",
+          "at": "2026-09-12T21:25:01.400520+00:00",
+          "stage": "collect",
+          "message": "Preserved 8 evidence items at commit 92b61b0.",
+          "data": {
+            "count": 8
+          }
+        },
+        {
+          "id": 14,
+          "case_id": "inv-46241e95118f",
+          "event_key": "inv-46241e95118f:retrieved",
+          "at": "2026-09-12T21:25:01.481611+00:00",
+          "stage": "retrieve",
+          "message": "Ranked 8 evidence items using lexical retrieval.",
+          "data": {
+            "ids": [
+              "e-artifact-10305483759-1-1",
+              "e-job-103622314972",
+              "e-artifact-10305483759-1-3",
+              "e-artifact-10305483759-1-2",
+              "e-code-0",
+              "e-artifact-10305483759-0",
+              "e-run",
+              "e-artifact-10305483759-2"
+            ],
+            "version": "retrieval-v1"
+          }
+        },
+        {
+          "id": 15,
+          "case_id": "inv-46241e95118f",
+          "event_key": "inv-46241e95118f:db3682a3365a49359928a43cff1c1153",
+          "at": "2026-09-12T21:25:03.731097+00:00",
+          "stage": "model_call",
+          "message": "Reserved a model call before dispatch.",
+          "data": {
+            "model": "Qwen/Qwen3-235B-A22B-Instruct-2507:novita",
+            "ordinal": 1,
+            "prompt_version": "failurelab-agents-v2"
+          }
+        },
+        {
+          "id": 16,
+          "case_id": "inv-46241e95118f",
+          "event_key": "inv-46241e95118f:2d7ddb6d48264a1fb97600d3d3d42cf8",
+          "at": "2026-09-12T21:25:09.515218+00:00",
+          "stage": "model_usage",
+          "message": "Recorded provider-reported usage.",
+          "data": {
+            "task": "Propose at most three causes supported by incident-specific observations, ordered by evidence strength. If none is supported, return one unknown hypothesis. Use status=proposed.",
+            "model": "Qwen/Qwen3-235B-A22B-Instruct-2507:novita",
+            "duration_ms": 5784,
+            "input_tokens": 46820,
+            "output_tokens": 241
+          }
+        },
+        {
+          "id": 17,
+          "case_id": "inv-46241e95118f",
+          "event_key": "inv-46241e95118f:diagnosed",
+          "at": "2026-09-12T21:25:09.733507+00:00",
+          "stage": "diagnose",
+          "message": "Diagnosis agent proposed 1 hypotheses.",
+          "data": {
+            "mode": "chat",
+            "prompt_version": "failurelab-agents-v2"
+          }
+        },
+        {
+          "id": 18,
+          "case_id": "inv-46241e95118f",
+          "event_key": "inv-46241e95118f:e86a8e7b26214c3b8978900e58b1b414",
+          "at": "2026-09-12T21:25:09.774556+00:00",
+          "stage": "model_call",
+          "message": "Reserved a model call before dispatch.",
+          "data": {
+            "model": "Qwen/Qwen3-235B-A22B-Instruct-2507:novita",
+            "ordinal": 2,
+            "prompt_version": "failurelab-agents-v2"
+          }
+        },
+        {
+          "id": 19,
+          "case_id": "inv-46241e95118f",
+          "event_key": "inv-46241e95118f:aa74a11838c14a5a8e5b84d7db9f0e45",
+          "at": "2026-09-12T21:25:20.217390+00:00",
+          "stage": "model_usage",
+          "message": "Recorded provider-reported usage.",
+          "data": {
+            "task": "Choose bounded interventions that discriminate between evidence-supported hypotheses. No arbitrary code or commands. Never plan an experiment for an unknown cause; return an empty experiments list when all causes are unknown.",
+            "model": "Qwen/Qwen3-235B-A22B-Instruct-2507:novita",
+            "duration_ms": 10442,
+            "input_tokens": 46938,
+            "output_tokens": 132
+          }
+        },
+        {
+          "id": 20,
+          "case_id": "inv-46241e95118f",
+          "event_key": "inv-46241e95118f:planned",
+          "at": "2026-09-12T21:25:21.003942+00:00",
+          "stage": "plan",
+          "message": "Experiment agent selected 1 bounded interventions.",
+          "data": {
+            "plans": [
+              {
+                "hypothesis_id": "h1",
+                "intervention": "repeat_baseline",
+                "rationale": "The hypothesis that the API returns prices in cents but the frontend displays them as dollars is directly supported by evidence showing the API response with 'price':7495 and 'price':1250, and the displayed total being '$16,240.00' instead of '$162.40'. Repeating the baseline test will confirm the consistency of this behavior without changes.",
+                "repetitions": 3
+              }
+            ]
+          }
+        },
+        {
+          "id": 21,
+          "case_id": "inv-46241e95118f",
+          "event_key": "inv-46241e95118f:experiment:h1:repeat_baseline",
+          "at": "2026-09-12T21:26:26.067684+00:00",
+          "stage": "experiment",
+          "message": "repeat_baseline: inconclusive (0/3 baseline, 0/3 intervention passes).",
+          "data": {
+            "hypothesis_id": "h1",
+            "intervention": "repeat_baseline",
+            "baseline_passes": 0,
+            "intervention_passes": 0,
+            "repetitions": 3,
+            "verdict": "inconclusive",
+            "duration_ms": 23909,
+            "observations": [
+              "baseline 1: FAIL; 1 unchanged assertions",
+              "intervention 1: FAIL; 1 unchanged assertions",
+              "baseline 2: FAIL; 1 unchanged assertions",
+              "intervention 2: FAIL; 1 unchanged assertions",
+              "baseline 3: FAIL; 1 unchanged assertions",
+              "intervention 3: FAIL; 1 unchanged assertions"
+            ],
+            "artifacts": [
+              "runner-cafdd74050b063d0d409a2d3c6a01c262416dcae4c095cba32a65224b53b441b.png",
+              "runner-c7642b5c8f2e28458751d494f2f3ad55e0dd578ccb61d2026de3d43153d3ed85.zip",
+              "runner-cafdd74050b063d0d409a2d3c6a01c262416dcae4c095cba32a65224b53b441b.png",
+              "runner-2d004996d45afee37e2da445546d7213b50c3c8437cf87484eb4ecceb72839f0.zip"
+            ],
+            "environment": {
+              "runner": "isolated-repository-runner-v1",
+              "commit_sha": "92b61b0eb9a55a73886394979d66cc158f3a99e8",
+              "manifest_sha256": "3a3a95010b05ad72f9f494e076f0d61404f254b82315247292dd5c193091badf",
+              "lockfile_sha256": "28070f94663b866c8fd5d0aa88e1a21e9c3a632881c8b9d2b72481cbb89cc586",
+              "acceptance_workflow_url": "https://github.com/MJA0211/failurelab-ci-validation/actions/runs/34719910740",
+              "transport": "GitHub Actions dispatch and artifact return; live runner HTTP executed inside VM",
+              "artifact_sha256": {
+                "runner-cafdd74050b063d0d409a2d3c6a01c262416dcae4c095cba32a65224b53b441b.png": "cafdd74050b063d0d409a2d3c6a01c262416dcae4c095cba32a65224b53b441b",
+                "runner-c7642b5c8f2e28458751d494f2f3ad55e0dd578ccb61d2026de3d43153d3ed85.zip": "c7642b5c8f2e28458751d494f2f3ad55e0dd578ccb61d2026de3d43153d3ed85",
+                "runner-2d004996d45afee37e2da445546d7213b50c3c8437cf87484eb4ecceb72839f0.zip": "2d004996d45afee37e2da445546d7213b50c3c8437cf87484eb4ecceb72839f0"
+              }
+            }
+          }
+        },
+        {
+          "id": 22,
+          "case_id": "inv-46241e95118f",
+          "event_key": "inv-46241e95118f:reported",
+          "at": "2026-09-12T21:26:26.120737+00:00",
+          "stage": "report",
+          "message": "Investigation report assembled with explicit evidence and uncertainty.",
+          "data": {
+            "outcome": "inconclusive"
+          }
+        }
+      ],
+      "human_reviews": []
+    },
+    {
+      "attempt": 3,
+      "case_id": "inv-bc1e08adab69",
+      "versions": {
+        "model": "Qwen/Qwen3-235B-A22B-Instruct-2507:novita",
+        "mode": "chat",
+        "prompt": "failurelab-agents-v3",
+        "retrieval": "retrieval-v1",
+        "retrieval_mode": "lexical"
+      },
+      "hypotheses": [
+        {
+          "id": "h1",
+          "cause": "api_contract",
+          "title": "API contract mismatch: price in cents vs. expected dollars",
+          "explanation": "The test expects the total to be '$162.40', but the application displays '$16,240.00'. The observed invoice response shows line items with prices of 7495 and 1250, which sum to 16240. This indicates the API returns prices in cents (e.g., 7495 cents = $74.95), but the frontend incorrectly treats them as dollars. The test expectation of $162.40 suggests it assumes input in dollars, creating a contract mismatch between test and implementation.",
+          "evidence_ids": [
+            "e-artifact-10305483759-1-1",
+            "e-artifact-10305483759-1-3",
+            "e-artifact-10305483759-0"
+          ],
+          "status": "supported"
+        }
+      ],
+      "experiments": [
+        {
+          "hypothesis_id": "h1",
+          "intervention": "restore_response",
+          "baseline_passes": 0,
+          "intervention_passes": 3,
+          "repetitions": 3,
+          "verdict": "supported",
+          "duration_ms": 20250,
+          "observations": [
+            "baseline 1: FAIL; 1 unchanged assertions",
+            "intervention 1: PASS; 1 unchanged assertions",
+            "baseline 2: FAIL; 1 unchanged assertions",
+            "intervention 2: PASS; 1 unchanged assertions",
+            "baseline 3: FAIL; 1 unchanged assertions",
+            "intervention 3: PASS; 1 unchanged assertions"
+          ],
+          "artifacts": [
+            "runner-cafdd74050b063d0d409a2d3c6a01c262416dcae4c095cba32a65224b53b441b.png",
+            "runner-43961ed64b69d0cdd85c3942bfabf0295a342a96558cf50c0a7db4ee0520e5d4.zip",
+            "runner-af1480166869ffe9aeae6fbb84c48b98c379a94cff650262b0f584b501661a31.png",
+            "runner-b6a60e095295dabe1e97a4cd82050c6ef3ce8f36d0079f64d0699fb40b7ee848.zip"
+          ],
+          "environment": {
+            "runner": "isolated-repository-runner-v1",
+            "commit_sha": "92b61b0eb9a55a73886394979d66cc158f3a99e8",
+            "manifest_sha256": "3a3a95010b05ad72f9f494e076f0d61404f254b82315247292dd5c193091badf",
+            "lockfile_sha256": "28070f94663b866c8fd5d0aa88e1a21e9c3a632881c8b9d2b72481cbb89cc586",
+            "acceptance_workflow_url": "https://github.com/MJA0211/failurelab-ci-validation/actions/runs/34720056503",
+            "transport": "GitHub Actions dispatch and artifact return; live runner HTTP executed inside VM",
+            "artifact_sha256": {
+              "runner-cafdd74050b063d0d409a2d3c6a01c262416dcae4c095cba32a65224b53b441b.png": "cafdd74050b063d0d409a2d3c6a01c262416dcae4c095cba32a65224b53b441b",
+              "runner-43961ed64b69d0cdd85c3942bfabf0295a342a96558cf50c0a7db4ee0520e5d4.zip": "43961ed64b69d0cdd85c3942bfabf0295a342a96558cf50c0a7db4ee0520e5d4",
+              "runner-af1480166869ffe9aeae6fbb84c48b98c379a94cff650262b0f584b501661a31.png": "af1480166869ffe9aeae6fbb84c48b98c379a94cff650262b0f584b501661a31",
+              "runner-b6a60e095295dabe1e97a4cd82050c6ef3ce8f36d0079f64d0699fb40b7ee848.zip": "b6a60e095295dabe1e97a4cd82050c6ef3ce8f36d0079f64d0699fb40b7ee848"
+            }
+          }
+        }
+      ],
+      "metrics": {
+        "duration_ms": 86819,
+        "model_calls": 2,
+        "input_tokens": 93876,
+        "output_tokens": 356,
+        "estimated_model_cost_usd": null
+      },
+      "model_usage": [
+        {
+          "task": "Propose at most three causes supported by incident-specific observations, ordered by evidence strength. If none is supported, return one unknown hypothesis. Use status=proposed.",
+          "model": "Qwen/Qwen3-235B-A22B-Instruct-2507:novita",
+          "duration_ms": 6797,
+          "input_tokens": 46820,
+          "output_tokens": 259
+        },
+        {
+          "task": "Choose bounded interventions that discriminate between evidence-supported hypotheses, using the intervention descriptions in the schema. Prefer a reviewed application change that tests the proposed mechanism; repeat_baseline measures repeatability only and cannot test causality. No arbitrary code or commands. Never plan an experiment for an unknown cause; return an empty experiments list when all causes are unknown.",
+          "model": "Qwen/Qwen3-235B-A22B-Instruct-2507:novita",
+          "duration_ms": 10290,
+          "input_tokens": 47056,
+          "output_tokens": 97
+        }
+      ],
+      "events": [
+        {
+          "id": 24,
+          "case_id": "inv-bc1e08adab69",
+          "event_key": "inv-bc1e08adab69:collected",
+          "at": "2026-09-12T21:28:06.951620+00:00",
+          "stage": "collect",
+          "message": "Preserved 8 evidence items at commit 92b61b0.",
+          "data": {
+            "count": 8
+          }
+        },
+        {
+          "id": 25,
+          "case_id": "inv-bc1e08adab69",
+          "event_key": "inv-bc1e08adab69:retrieved",
+          "at": "2026-09-12T21:28:07.048746+00:00",
+          "stage": "retrieve",
+          "message": "Ranked 8 evidence items using lexical retrieval.",
+          "data": {
+            "ids": [
+              "e-artifact-10305483759-1-1",
+              "e-job-103622314972",
+              "e-artifact-10305483759-1-3",
+              "e-artifact-10305483759-1-2",
+              "e-code-0",
+              "e-artifact-10305483759-0",
+              "e-run",
+              "e-artifact-10305483759-2"
+            ],
+            "version": "retrieval-v1"
+          }
+        },
+        {
+          "id": 26,
+          "case_id": "inv-bc1e08adab69",
+          "event_key": "inv-bc1e08adab69:e6950912fb6b44679caebd12790cd0ca",
+          "at": "2026-09-12T21:28:09.525079+00:00",
+          "stage": "model_call",
+          "message": "Reserved a model call before dispatch.",
+          "data": {
+            "model": "Qwen/Qwen3-235B-A22B-Instruct-2507:novita",
+            "ordinal": 1,
+            "prompt_version": "failurelab-agents-v3"
+          }
+        },
+        {
+          "id": 27,
+          "case_id": "inv-bc1e08adab69",
+          "event_key": "inv-bc1e08adab69:f7eb34fa3d874cfaad73e87c959f8602",
+          "at": "2026-09-12T21:28:16.322177+00:00",
+          "stage": "model_usage",
+          "message": "Recorded provider-reported usage.",
+          "data": {
+            "task": "Propose at most three causes supported by incident-specific observations, ordered by evidence strength. If none is supported, return one unknown hypothesis. Use status=proposed.",
+            "model": "Qwen/Qwen3-235B-A22B-Instruct-2507:novita",
+            "duration_ms": 6797,
+            "input_tokens": 46820,
+            "output_tokens": 259
+          }
+        },
+        {
+          "id": 28,
+          "case_id": "inv-bc1e08adab69",
+          "event_key": "inv-bc1e08adab69:diagnosed",
+          "at": "2026-09-12T21:28:16.347717+00:00",
+          "stage": "diagnose",
+          "message": "Diagnosis agent proposed 1 hypotheses.",
+          "data": {
+            "mode": "chat",
+            "prompt_version": "failurelab-agents-v3"
+          }
+        },
+        {
+          "id": 29,
+          "case_id": "inv-bc1e08adab69",
+          "event_key": "inv-bc1e08adab69:4fbf5cf3000e4c23b38a0f8983959463",
+          "at": "2026-09-12T21:28:16.374747+00:00",
+          "stage": "model_call",
+          "message": "Reserved a model call before dispatch.",
+          "data": {
+            "model": "Qwen/Qwen3-235B-A22B-Instruct-2507:novita",
+            "ordinal": 2,
+            "prompt_version": "failurelab-agents-v3"
+          }
+        },
+        {
+          "id": 30,
+          "case_id": "inv-bc1e08adab69",
+          "event_key": "inv-bc1e08adab69:4745c6fda3de4ae39c604a78e48bc935",
+          "at": "2026-09-12T21:28:26.666043+00:00",
+          "stage": "model_usage",
+          "message": "Recorded provider-reported usage.",
+          "data": {
+            "task": "Choose bounded interventions that discriminate between evidence-supported hypotheses, using the intervention descriptions in the schema. Prefer a reviewed application change that tests the proposed mechanism; repeat_baseline measures repeatability only and cannot test causality. No arbitrary code or commands. Never plan an experiment for an unknown cause; return an empty experiments list when all causes are unknown.",
+            "model": "Qwen/Qwen3-235B-A22B-Instruct-2507:novita",
+            "duration_ms": 10290,
+            "input_tokens": 47056,
+            "output_tokens": 97
+          }
+        },
+        {
+          "id": 31,
+          "case_id": "inv-bc1e08adab69",
+          "event_key": "inv-bc1e08adab69:planned",
+          "at": "2026-09-12T21:28:27.171690+00:00",
+          "stage": "plan",
+          "message": "Experiment agent selected 1 bounded interventions.",
+          "data": {
+            "plans": [
+              {
+                "hypothesis_id": "h1",
+                "intervention": "restore_response",
+                "rationale": "The hypothesis states that the API returns prices in cents but the frontend treats them as dollars. Modifying the application to convert the price from cents to dollars before formatting would test this mechanism by aligning the response contract with the test's expectation.",
+                "repetitions": 3
+              }
+            ]
+          }
+        },
+        {
+          "id": 32,
+          "case_id": "inv-bc1e08adab69",
+          "event_key": "inv-bc1e08adab69:experiment:h1:restore_response",
+          "at": "2026-09-12T21:29:31.923396+00:00",
+          "stage": "experiment",
+          "message": "restore_response: supported (0/3 baseline, 3/3 intervention passes).",
+          "data": {
+            "hypothesis_id": "h1",
+            "intervention": "restore_response",
+            "baseline_passes": 0,
+            "intervention_passes": 3,
+            "repetitions": 3,
+            "verdict": "supported",
+            "duration_ms": 20250,
+            "observations": [
+              "baseline 1: FAIL; 1 unchanged assertions",
+              "intervention 1: PASS; 1 unchanged assertions",
+              "baseline 2: FAIL; 1 unchanged assertions",
+              "intervention 2: PASS; 1 unchanged assertions",
+              "baseline 3: FAIL; 1 unchanged assertions",
+              "intervention 3: PASS; 1 unchanged assertions"
+            ],
+            "artifacts": [
+              "runner-cafdd74050b063d0d409a2d3c6a01c262416dcae4c095cba32a65224b53b441b.png",
+              "runner-43961ed64b69d0cdd85c3942bfabf0295a342a96558cf50c0a7db4ee0520e5d4.zip",
+              "runner-af1480166869ffe9aeae6fbb84c48b98c379a94cff650262b0f584b501661a31.png",
+              "runner-b6a60e095295dabe1e97a4cd82050c6ef3ce8f36d0079f64d0699fb40b7ee848.zip"
+            ],
+            "environment": {
+              "runner": "isolated-repository-runner-v1",
+              "commit_sha": "92b61b0eb9a55a73886394979d66cc158f3a99e8",
+              "manifest_sha256": "3a3a95010b05ad72f9f494e076f0d61404f254b82315247292dd5c193091badf",
+              "lockfile_sha256": "28070f94663b866c8fd5d0aa88e1a21e9c3a632881c8b9d2b72481cbb89cc586",
+              "acceptance_workflow_url": "https://github.com/MJA0211/failurelab-ci-validation/actions/runs/34720056503",
+              "transport": "GitHub Actions dispatch and artifact return; live runner HTTP executed inside VM",
+              "artifact_sha256": {
+                "runner-cafdd74050b063d0d409a2d3c6a01c262416dcae4c095cba32a65224b53b441b.png": "cafdd74050b063d0d409a2d3c6a01c262416dcae4c095cba32a65224b53b441b",
+                "runner-43961ed64b69d0cdd85c3942bfabf0295a342a96558cf50c0a7db4ee0520e5d4.zip": "43961ed64b69d0cdd85c3942bfabf0295a342a96558cf50c0a7db4ee0520e5d4",
+                "runner-af1480166869ffe9aeae6fbb84c48b98c379a94cff650262b0f584b501661a31.png": "af1480166869ffe9aeae6fbb84c48b98c379a94cff650262b0f584b501661a31",
+                "runner-b6a60e095295dabe1e97a4cd82050c6ef3ce8f36d0079f64d0699fb40b7ee848.zip": "b6a60e095295dabe1e97a4cd82050c6ef3ce8f36d0079f64d0699fb40b7ee848"
+              }
+            }
+          }
+        },
+        {
+          "id": 33,
+          "case_id": "inv-bc1e08adab69",
+          "event_key": "inv-bc1e08adab69:reported",
+          "at": "2026-09-12T21:29:31.967459+00:00",
+          "stage": "report",
+          "message": "Investigation report assembled with explicit evidence and uncertainty.",
+          "data": {
+            "outcome": "supported"
+          }
+        }
+      ],
+      "human_reviews": []
+    }
+  ],
+  "webhook_replay": {
+    "scope": "Local HTTP replay using actual GitHub run metadata; not a GitHub-delivered webhook",
+    "unsigned_status": 401,
+    "tampered_status": 401,
+    "signed_status": 200,
+    "duplicate_created": false,
+    "case_id": "inv-ff7837c5983a"
+  },
+  "review_scope": "Mechanism/citation checks reviewed by the assistant; independent human review remains pending. The final explanation omits quantity=2 when summarizing the arithmetic; the cited source and trace retain it."
+}
