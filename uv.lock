@@ -476,7 +476,7 @@ requires-dist = [
     { name = "langgraph-checkpoint-sqlite", specifier = ">=3,<4" },
     { name = "numpy", specifier = ">=2,<3" },
     { name = "playwright", specifier = ">=1.51,<2" },
-    { name = "psycopg", extras = ["binary", "pool"], marker = "extra == 'postgres'", specifier = ">=3.2,<4" },
+    { name = "psycopg", extras = ["binary", "pool"], marker = "extra == 'postgres'", specifier = ">=3.3.5,<4" },
     { name = "pydantic-settings", specifier = ">=2.8,<3" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8,<10" },
     { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=6,<8" },
